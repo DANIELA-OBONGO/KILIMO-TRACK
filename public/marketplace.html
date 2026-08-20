@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KilimoTrack Marketplace — Buy & Sell Agricultural Products in Kenya</title>
+  <meta name="description" content="Browse fresh produce, grains, vegetables and more from Kenyan farmers. Connect directly with sellers on the KilimoTrack marketplace."/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --text:#eef8ff;--panel:rgba(18,24,18,.55);--border:rgba(255,255,255,.15);
+      --accent:#90e0ef;--accent-dark:#62b6cb;--danger:#ff6b6b;
+      --warning:#ffd166;--success:#95e1d3;--dark-bg:#041f32;
+    }
+    *{box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{
+      margin:0;min-height:100vh;font-family:'Inter',system-ui,sans-serif;color:var(--text);
+      background:radial-gradient(circle at top left,rgba(144,224,239,.16),transparent 24%),
+                 radial-gradient(circle at bottom right,rgba(255,255,255,.10),transparent 18%),
+                 linear-gradient(135deg,#041f32 0%,#082631 40%,#0c2a3a 100%);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";position:fixed;inset:0;
+      background-image:url("images/Real African Books - This is cute, this African….jpeg");
+      background-position:center;background-size:cover;
+      opacity:0.5;filter:saturate(1.1);z-index:-2;
+    }
+    body::after{content:"";position:fixed;inset:0;background:rgba(4,31,50,.3);z-index:-1;}
+
+    /* NAV */
+    nav{background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);backdrop-filter:blur(20px);padding:1rem 2rem;position:sticky;top:0;z-index:50;}
+    .nav-container{width:min(1400px,calc(100% - 2rem));margin:0 auto;display:flex;justify-content:space-between;align-items:center;}
+    .logo{display:flex;align-items:center;gap:.75rem;font-weight:700;font-size:1.3rem;text-decoration:none;color:var(--text);}
+    .logo span{width:40px;height:40px;display:grid;place-items:center;border-radius:10px;background:rgba(144,224,239,.18);color:#0b3b47;font-weight:800;font-size:.9rem;}
+    .nav-links{display:flex;gap:1.5rem;align-items:center;}
+    .nav-links a{color:rgba(255,255,255,.7);text-decoration:none;font-weight:500;transition:color .2s;font-size:.95rem;}
+    .nav-links a:hover{color:var(--accent);}
+
+    /* HERO BAND */
+    .market-hero{text-align:center;padding:3rem 2rem 2rem;position:relative;}
+    .market-hero h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.2rem);margin:0 0 .75rem;font-weight:800;}
+    .market-hero h1 span{color:var(--accent);}
+    .market-hero p{color:rgba(255,255,255,.65);max-width:540px;margin:0 auto 2rem;font-size:1.05rem;line-height:1.7;}
+
+    /* SEARCH BAR */
+    .search-bar{display:flex;gap:.75rem;max-width:700px;margin:0 auto;flex-wrap:wrap;}
+    .search-input{flex:1;min-width:200px;padding:.85rem 1.2rem;border-radius:12px;border:1px solid rgba(144,224,239,.3);background:rgba(255,255,255,.08);color:var(--text);font-family:inherit;font-size:1rem;outline:none;backdrop-filter:blur(8px);}
+    .search-input::placeholder{color:rgba(255,255,255,.35);}
+    .search-input:focus{border-color:var(--accent);}
+    .search-btn{padding:.85rem 1.8rem;border-radius:12px;border:none;background:linear-gradient(135deg,var(--accent-dark),var(--accent));color:#041f32;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:filter .2s;white-space:nowrap;}
+    .search-btn:hover{filter:brightness(1.1);}
+
+    /* FILTER STRIP */
+    .filter-strip{width:min(1400px,calc(100% - 2rem));margin:1.5rem auto 0;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;}
+    .filter-chip{padding:.5rem 1.1rem;border-radius:100px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);cursor:pointer;font-size:.85rem;font-weight:500;transition:all .2s;white-space:nowrap;}
+    .filter-chip:hover,.filter-chip.active{background:rgba(144,224,239,.2);border-color:rgba(144,224,239,.4);color:var(--accent);}
+    .filter-select{padding:.5rem 1rem;border-radius:100px;border:1px solid rgba(255,255,255,.15);background:rgba(8,38,49,.8);color:rgba(255,255,255,.8);font-family:inherit;font-size:.85rem;cursor:pointer;outline:none;}
+    .filter-select option{background:#0c2a3a;}
+    .filter-count{margin-left:auto;color:rgba(255,255,255,.45);font-size:.85rem;}
+
+    /* MAIN LAYOUT */
+    .market-container{width:min(1400px,calc(100% - 2rem));margin:2rem auto 4rem;}
+
+    /* LISTINGS GRID */
+    .listings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;}
+
+    /* LISTING CARD */
+    .listing-card{background:var(--panel);border:1px solid var(--border);border-radius:18px;backdrop-filter:blur(10px);overflow:hidden;transition:all .3s ease;cursor:pointer;position:relative;}
+    .listing-card:hover{transform:translateY(-6px);border-color:rgba(144,224,239,.3);box-shadow:0 20px 40px rgba(0,0,0,.3);}
+    .listing-card-img{height:180px;background:linear-gradient(135deg,rgba(8,38,49,.8),rgba(12,42,58,.9));display:flex;align-items:center;justify-content:center;font-size:4rem;position:relative;overflow:hidden;}
+    .listing-card-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+    .listing-card-body{padding:1.25rem;}
+    .listing-card-category{font-size:.75rem;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem;}
+    .listing-card-name{font-size:1.1rem;font-weight:700;margin:0 0 .5rem;line-height:1.3;}
+    .listing-card-meta{color:rgba(255,255,255,.55);font-size:.85rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.2rem;}
+    .listing-card-footer{display:flex;justify-content:space-between;align-items:center;padding-top:.75rem;border-top:1px solid rgba(255,255,255,.08);}
+    .listing-price{font-size:1.3rem;font-weight:700;color:var(--accent);}
+    .listing-price small{font-size:.7rem;font-weight:400;color:rgba(255,255,255,.5);display:block;line-height:1;}
+    .btn-contact{padding:.55rem 1.2rem;border-radius:8px;background:rgba(144,224,239,.15);border:1px solid rgba(144,224,239,.3);color:var(--accent);font-family:inherit;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;}
+    .btn-contact:hover{background:rgba(144,224,239,.3);}
+
+    /* EMPTY / LOADING */
+    .market-empty{text-align:center;padding:4rem 2rem;color:rgba(255,255,255,.4);}
+    .market-empty p{font-size:1.1rem;margin:.5rem 0;}
+    .skeleton-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:18px;overflow:hidden;animation:shimmer 1.5s infinite;}
+    .skeleton-card .sk-img{height:180px;background:rgba(255,255,255,.06);}
+    .skeleton-card .sk-body{padding:1.25rem;}
+    .sk-line{height:14px;border-radius:6px;background:rgba(255,255,255,.08);margin-bottom:.75rem;}
+    .sk-line.short{width:50%;}
+    .sk-line.medium{width:70%;}
+    @keyframes shimmer{0%,100%{opacity:.5}50%{opacity:1}}
+
+    /* PAGINATION */
+    .pagination{display:flex;gap:.5rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap;}
+    .page-btn{padding:.6rem 1.1rem;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:rgba(255,255,255,.7);cursor:pointer;font-family:inherit;font-size:.9rem;transition:all .2s;}
+    .page-btn:hover,.page-btn.active{background:rgba(144,224,239,.2);border-color:rgba(144,224,239,.4);color:var(--accent);}
+    .page-btn:disabled{opacity:.3;cursor:default;}
+
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(4,31,50,.75);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem;}
+    .modal-overlay.open{display:flex;}
+    .modal{background:#082631;border:1px solid var(--border);border-radius:22px;padding:2.5rem;width:min(580px,100%);max-height:90vh;overflow-y:auto;position:relative;animation:slideUp .3s ease;}
+    @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+    .modal-close{position:absolute;top:1rem;right:1.25rem;background:none;border:none;color:rgba(255,255,255,.5);font-size:1.4rem;cursor:pointer;}
+    .modal-close:hover{color:#fff;}
+    .modal-product-title{font-family:'Playfair Display',serif;font-size:1.5rem;margin:0 0 .5rem;}
+    .modal-product-cat{color:var(--accent);font-size:.85rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem;}
+    .detail-row{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.07);padding:.75rem 0;font-size:.9rem;}
+    .detail-row .label{color:rgba(255,255,255,.5);}
+    .detail-row .value{font-weight:600;}
+    .modal-desc{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:1rem;margin:1rem 0;font-size:.9rem;color:rgba(255,255,255,.75);line-height:1.6;}
+    .modal-alert{padding:.75rem 1rem;border-radius:8px;margin:1rem 0;font-size:.87rem;display:none;}
+    .modal-alert.error{background:rgba(255,107,107,.15);border:1px solid rgba(255,107,107,.3);color:#ff6b6b;}
+    .modal-alert.success{background:rgba(149,225,211,.15);border:1px solid rgba(149,225,211,.3);color:var(--success);}
+    .modal-alert.show{display:block;}
+    .contact-form textarea{width:100%;padding:.85rem 1rem;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--text);font-family:inherit;font-size:.9rem;min-height:90px;outline:none;resize:vertical;margin-bottom:.75rem;}
+    .contact-form textarea:focus{border-color:var(--accent);}
+    .btn-send{width:100%;padding:.9rem;border-radius:10px;border:none;background:linear-gradient(135deg,var(--accent-dark),var(--accent));color:#041f32;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:filter .2s;}
+    .btn-send:hover{filter:brightness(1.1);}
+    .btn-send:disabled{opacity:.6;cursor:not-allowed;}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:2rem;right:2rem;background:#082631;border:1px solid rgba(144,224,239,.3);border-radius:14px;padding:1rem 1.5rem;color:var(--text);font-size:.9rem;z-index:999;transform:translateY(100px);opacity:0;transition:all .4s ease;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,.4);}
+    .toast.show{transform:translateY(0);opacity:1;}
+
+    footer{text-align:center;color:rgba(255,255,255,.4);font-size:.85rem;padding:2rem;border-top:1px solid var(--border);}
+
+    @media(max-width:640px){
+      .search-bar{flex-direction:column;}
+      .market-hero h1{font-size:1.8rem;}
+      .listings-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-container">
+    <a href="index.html" class="logo"><span>KT</span>KilimoTrack</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a id="nav-dashboard" href="login.html" style="color:var(--accent);font-weight:600;">Dashboard</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="market-hero">
+  <h1>Agricultural <span>Marketplace</span></h1>
+  <p>Fresh produce directly from Kenyan farmers. Browse listings, connect with sellers, and grow your food network.</p>
+  <div class="search-bar">
+    <input type="text" id="search-input" class="search-input" placeholder="🔍 Search maize, beans, tomatoes…" onkeydown="if(event.key==='Enter') doSearch()"/>
+    <button class="search-btn" onclick="doSearch()">Search</button>
+  </div>
+</div>
+
+<!-- FILTER STRIP -->
+<div class="filter-strip">
+  <button class="filter-chip active" data-cat="" onclick="setCategory(this,'')">All</button>
+  <button class="filter-chip" data-cat="Grains" onclick="setCategory(this,'Grains')">Grains</button>
+  <button class="filter-chip" data-cat="Legumes" onclick="setCategory(this,'Legumes')">Legumes</button>
+  <button class="filter-chip" data-cat="Vegetables" onclick="setCategory(this,'Vegetables')">Vegetables</button>
+  <button class="filter-chip" data-cat="Fruits" onclick="setCategory(this,'Fruits')">Fruits</button>
+  <button class="filter-chip" data-cat="Tubers &amp; Roots" onclick="setCategory(this,'Tubers &amp; Roots')">Tubers &amp; Roots</button>
+  <button class="filter-chip" data-cat="Dairy" onclick="setCategory(this,'Dairy')">Dairy</button>
+  <button class="filter-chip" data-cat="Livestock" onclick="setCategory(this,'Livestock')">Livestock</button>
+  <select class="filter-select" id="location-filter" onchange="doSearch()">
+    <option value="">📍 All Locations</option>
+    <option>Nairobi</option><option>Mombasa</option><option>Nakuru</option>
+    <option>Kisumu</option><option>Eldoret</option><option>Meru</option>
+    <option>Kirinyaga County</option><option>Migori County</option>
+    <option>Nyeri</option><option>Kakamega</option><option>Machakos</option>
+  </select>
+  <span class="filter-count" id="result-count"></span>
+</div>
+
+<!-- LISTINGS -->
+<div class="market-container">
+  <div class="listings-grid" id="listings-grid">
+    <!-- Skeleton cards while loading -->
+    <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line short"></div><div class="sk-line medium"></div><div class="sk-line"></div></div></div>
+    <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line short"></div><div class="sk-line medium"></div><div class="sk-line"></div></div></div>
+    <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line short"></div><div class="sk-line medium"></div><div class="sk-line"></div></div></div>
+    <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line short"></div><div class="sk-line medium"></div><div class="sk-line"></div></div></div>
+  </div>
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<footer>KilimoTrack Marketplace © 2026 — kilimo taji . kilimo yenye mapato</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- LISTING DETAIL + CONTACT MODAL -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeDetail()">✕</button>
+    <div id="modal-emoji" style="font-size:3rem;margin-bottom:1rem;">🌾</div>
+    <div class="modal-product-title" id="modal-title">—</div>
+    <div class="modal-product-cat" id="modal-cat">—</div>
+    <div id="modal-details"></div>
+    <div class="modal-desc" id="modal-desc" style="display:none;"></div>
+
+    <div id="contact-section">
+      <div class="modal-alert error" id="contact-error"></div>
+      <div class="modal-alert success" id="contact-success"></div>
+      <div id="contact-form-area" class="contact-form">
+        <p style="color:rgba(255,255,255,.6);font-size:.9rem;margin:1rem 0 .5rem;">Send a message to the seller to get their contact:</p>
+        <textarea id="contact-message" placeholder="Hi, I'm interested in your listing. Please contact me."></textarea>
+        <button class="btn-send" id="contact-btn" onclick="sendContactRequest()">📬 Contact Seller</button>
+      </div>
+      <div id="login-prompt" style="display:none;text-align:center;padding:1rem 0;">
+        <p style="color:rgba(255,255,255,.6);font-size:.9rem;">You must be logged in to contact a seller.</p>
+        <a href="login.html" style="display:inline-block;margin-top:.5rem;padding:.7rem 1.6rem;border-radius:10px;background:linear-gradient(135deg,var(--accent-dark),var(--accent));color:#041f32;font-weight:700;text-decoration:none;">Login / Sign Up</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── CONFIG ───────────────────────────────────────────────────────
+  const API = 'http://localhost/kilimotrack/api';
+
+  // ── Auth state ───────────────────────────────────────────────────
+  const token   = localStorage.getItem('kt_token') || null;
+  const userRaw = localStorage.getItem('kt_user');
+  const isLoggedIn = !!(token && userRaw);
+
+  // Update nav dashboard link
+  const navDash = document.getElementById('nav-dashboard');
+  if (isLoggedIn) { navDash.href = 'dashboard.html'; navDash.textContent = '→ Dashboard'; }
+  else            { navDash.href = 'login.html';     navDash.textContent = 'Login'; }
+
+  // ── State ────────────────────────────────────────────────────────
+  let currentPage     = 1;
+  let currentCategory = '';
+  let currentSearch   = '';
+  let currentListing  = null;
+
+  const categoryEmoji = {
+    'Grains':'🌽','Legumes':'🫘','Vegetables':'🥦','Fruits':'🍊',
+    'Tubers & Roots':'🥔','Dairy':'🥛','Poultry':'🐔','Livestock':'🐄','Other':'🌾'
+  };
+
+  // ── Fetch listings ────────────────────────────────────────────────
+  async function fetchListings(page = 1) {
+    const search   = document.getElementById('search-input').value.trim();
+    const location = document.getElementById('location-filter').value;
+    const params   = new URLSearchParams({ page });
+    if (search)          params.set('search', search);
+    if (currentCategory) params.set('category', currentCategory);
+    if (location)        params.set('location', location);
+
+    try {
+      const res  = await fetch(`${API}/marketplace/listings/list.php?${params}`);
+      const json = await res.json();
+      if (json.success) {
+        renderListings(json.listings || [], json.total || 0, json.total_pages || 1, json.page || 1);
+      } else {
+        renderError('Could not load listings.');
+      }
+    } catch {
+      renderError('Cannot reach the server. Make sure XAMPP is running.');
+    }
+  }
+
+  function renderListings(listings, total, totalPages, page) {
+    const grid = document.getElementById('listings-grid');
+    const countEl = document.getElementById('result-count');
+    countEl.textContent = total > 0 ? `${total} listing${total !== 1 ? 's' : ''} found` : '';
+
+    if (!listings.length) {
+      grid.innerHTML = `<div class="market-empty" style="grid-column:1/-1;"><p style="font-size:2.5rem;">🔍</p><p>No listings found.</p><p style="font-size:.9rem;">Try a different search or category.</p></div>`;
+      document.getElementById('pagination').innerHTML = '';
+      return;
+    }
+
+    grid.innerHTML = listings.map(l => {
+      const emoji = categoryEmoji[l.category] || '🌾';
+      const price = l.price ? `<div class="listing-price">KES ${parseFloat(l.price).toLocaleString()}<small>per ${l.unit || 'unit'}</small></div>` : `<div class="listing-price" style="color:rgba(255,255,255,.4);font-size:.9rem;">Price on request</div>`;
+      return `
+        <div class="listing-card" onclick="openDetail(${JSON.stringify(l).replace(/"/g,'&quot;')})">
+          <div class="listing-card-img">${emoji}</div>
+          <div class="listing-card-body">
+            <div class="listing-card-category">${l.category || 'Product'}</div>
+            <div class="listing-card-name">${l.product_name}</div>
+            <div class="listing-card-meta">
+              <span>🌍 ${l.location || l.seller_location || 'Kenya'}</span>
+              <span>👤 ${l.seller_name}${l.farm_name ? ' · ' + l.farm_name : ''}</span>
+              ${l.quantity ? `<span>📦 ${parseFloat(l.quantity).toLocaleString()} ${l.unit || ''} available</span>` : ''}
+            </div>
+            <div class="listing-card-footer">
+              ${price}
+              <button class="btn-contact" onclick="event.stopPropagation();openDetail(${JSON.stringify(l).replace(/"/g,'&quot;')})">Contact →</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Pagination
+    const pg = document.getElementById('pagination');
+    if (totalPages <= 1) { pg.innerHTML = ''; return; }
+    let html = '';
+    if (page > 1) html += `<button class="page-btn" onclick="goPage(${page-1})">← Prev</button>`;
+    for (let i = 1; i <= totalPages; i++) {
+      html += `<button class="page-btn${i === page ? ' active' : ''}" onclick="goPage(${i})">${i}</button>`;
+    }
+    if (page < totalPages) html += `<button class="page-btn" onclick="goPage(${page+1})">Next →</button>`;
+    pg.innerHTML = html;
+  }
+
+  function renderError(msg) {
+    document.getElementById('listings-grid').innerHTML = `<div class="market-empty" style="grid-column:1/-1;"><p style="font-size:2rem;">⚠️</p><p>${msg}</p></div>`;
+  }
+
+  // ── Filters ───────────────────────────────────────────────────────
+  function doSearch() { currentPage = 1; fetchListings(1); }
+  function goPage(p)  { currentPage = p; fetchListings(p); window.scrollTo({top:0,behavior:'smooth'}); }
+  function setCategory(el, cat) {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    currentCategory = cat; currentPage = 1; fetchListings(1);
+  }
+
+  // ── Detail Modal ──────────────────────────────────────────────────
+  function openDetail(listing) {
+    currentListing = listing;
+    document.getElementById('modal-emoji').textContent = categoryEmoji[listing.category] || '🌾';
+    document.getElementById('modal-title').textContent = listing.product_name;
+    document.getElementById('modal-cat').textContent   = listing.category || 'Agricultural Product';
+
+    const details = [
+      ['Seller',    listing.seller_name + (listing.farm_name ? ` · ${listing.farm_name}` : '')],
+      ['Location',  listing.location || listing.seller_location || 'Kenya'],
+      ['Quantity',  listing.quantity ? `${parseFloat(listing.quantity).toLocaleString()} ${listing.unit || ''}` : '—'],
+      ['Price',     listing.price ? `KES ${parseFloat(listing.price).toLocaleString()} per ${listing.unit || 'unit'}` : 'Contact for price'],
+      ['Listed',    formatDate(listing.created_at)],
+    ];
+    document.getElementById('modal-details').innerHTML = details.map(([l,v]) =>
+      `<div class="detail-row"><span class="label">${l}</span><span class="value">${v}</span></div>`
+    ).join('');
+
+    const descEl = document.getElementById('modal-desc');
+    if (listing.description) { descEl.textContent = listing.description; descEl.style.display = 'block'; }
+    else descEl.style.display = 'none';
+
+    // Contact section
+    document.getElementById('contact-error').className = 'modal-alert error';
+    document.getElementById('contact-success').className = 'modal-alert success';
+
+    if (isLoggedIn) {
+      document.getElementById('contact-form-area').style.display = 'block';
+      document.getElementById('login-prompt').style.display = 'none';
+      document.getElementById('contact-message').value = `Hi, I'm interested in your ${listing.product_name}. Please contact me.`;
+      const btn = document.getElementById('contact-btn');
+      btn.disabled = false; btn.textContent = '📬 Contact Seller';
+    } else {
+      document.getElementById('contact-form-area').style.display = 'none';
+      document.getElementById('login-prompt').style.display = 'block';
+    }
+
+    document.getElementById('detail-modal').classList.add('open');
+  }
+
+  function closeDetail() { document.getElementById('detail-modal').classList.remove('open'); }
+
+  document.getElementById('detail-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('detail-modal')) closeDetail();
+  });
+
+  // ── Contact Seller ────────────────────────────────────────────────
+  async function sendContactRequest() {
+    if (!currentListing || !isLoggedIn) return;
+    const btn = document.getElementById('contact-btn');
+    btn.disabled = true; btn.textContent = '⏳ Sending…';
+
+    const errEl  = document.getElementById('contact-error');
+    const succEl = document.getElementById('contact-success');
+    errEl.className = 'modal-alert error';
+    succEl.className = 'modal-alert success';
+
+    const data = {
+      listing_id: currentListing.id,
+      message: document.getElementById('contact-message').value.trim()
+    };
+
+    try {
+      const res  = await fetch(`${API}/marketplace/contact_requests/create.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+      if (json.success) {
+        succEl.textContent = '✅ Request sent! The seller can now see your name and phone number.';
+        succEl.className = 'modal-alert success show';
+        btn.textContent = '✅ Request Sent';
+        showToast('📬 Contact request sent to seller!');
+      } else {
+        errEl.textContent = '❌ ' + json.message;
+        errEl.className = 'modal-alert error show';
+        btn.disabled = false; btn.textContent = '📬 Contact Seller';
+      }
+    } catch {
+      errEl.textContent = '❌ Cannot reach server. Is XAMPP running?';
+      errEl.className = 'modal-alert error show';
+      btn.disabled = false; btn.textContent = '📬 Contact Seller';
+    }
+  }
+
+  // ── Toast ─────────────────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  // ── Utils ─────────────────────────────────────────────────────────
+  function formatDate(str) {
+    if (!str) return '—';
+    const d = new Date(str); if (isNaN(d)) return str;
+    return d.toLocaleDateString('en-KE', { day:'numeric', month:'short', year:'numeric' });
+  }
+
+  // ── Boot ──────────────────────────────────────────────────────────
+  fetchListings(1);
+</script>
+</body>
+</html>

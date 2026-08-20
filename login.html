@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KilimoTrack — Login</title>
+  <meta name="description" content="Log in to your KilimoTrack account to manage your farm records."/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--text:#eef8ff;--panel:rgba(18,24,18,.55);--border:rgba(255,255,255,.15);--accent:#90e0ef;--accent-dark:#62b6cb;--danger:#ff6b6b;--success:#95e1d3;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{
+      min-height:100vh;font-family:'Inter',system-ui,sans-serif;color:var(--text);
+      background:radial-gradient(circle at top left,rgba(144,224,239,.16),transparent 24%),
+                 radial-gradient(circle at bottom right,rgba(255,255,255,.10),transparent 18%),
+                 linear-gradient(135deg,#041f32 0%,#082631 40%,#0c2a3a 100%);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";position:fixed;inset:0;
+      background-image:url("images/ChatGPT Image Jun 23, 2026, 10_21_59 AM.png");
+      background-position:center;background-size:cover;opacity:0.5;filter:saturate(1.2);z-index:-2;
+    }
+    body::after{content:"";position:fixed;inset:0;background:rgba(4,31,50,.3);z-index:-1;}
+
+    .login-wrap{width:min(440px,calc(100% - 2rem));padding:2rem 0;}
+
+    .logo{display:flex;align-items:center;justify-content:center;gap:.75rem;font-weight:700;font-size:1.4rem;text-decoration:none;color:var(--text);margin-bottom:2rem;}
+    .logo span{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:rgba(144,224,239,.18);color:#0b3b47;font-weight:800;}
+
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:22px;backdrop-filter:blur(24px);padding:2.5rem;}
+    .card h1{font-family:'Playfair Display',serif;font-size:1.9rem;margin-bottom:.4rem;}
+    .card p.sub{color:rgba(255,255,255,.55);font-size:.9rem;margin-bottom:2rem;}
+
+    /* Toggle */
+    .toggle{display:flex;background:rgba(255,255,255,.06);border-radius:10px;padding:4px;margin-bottom:1.75rem;gap:4px;}
+    .toggle button{flex:1;padding:.65rem;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600;font-size:.9rem;transition:all .2s;background:transparent;color:rgba(255,255,255,.5);}
+    .toggle button.active{background:rgba(144,224,239,.2);color:var(--accent);box-shadow:0 0 0 1px rgba(144,224,239,.3);}
+
+    .form-group{margin-bottom:1.25rem;}
+    .form-group label{display:block;font-size:.85rem;font-weight:600;margin-bottom:.5rem;color:rgba(255,255,255,.75);}
+    .form-group input{width:100%;padding:.85rem 1rem;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--text);font-family:inherit;font-size:.95rem;outline:none;transition:border-color .2s;}
+    .form-group input:focus{border-color:var(--accent);}
+
+    .btn-submit{width:100%;padding:1rem;border-radius:12px;border:none;background:linear-gradient(135deg,var(--accent-dark),var(--accent));color:#041f32;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:all .25s;margin-top:.5rem;}
+    .btn-submit:hover{filter:brightness(1.1);transform:translateY(-2px);box-shadow:0 6px 20px rgba(144,224,239,.3);}
+    .btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+    .alert{padding:.9rem 1.1rem;border-radius:10px;margin-bottom:1rem;font-size:.9rem;display:none;}
+    .alert.error{background:rgba(255,107,107,.15);border:1px solid rgba(255,107,107,.3);color:#ff6b6b;}
+    .alert.success{background:rgba(149,225,211,.15);border:1px solid rgba(149,225,211,.3);color:var(--success);}
+    .alert.visible{display:block;}
+
+    .footer-links{text-align:center;margin-top:1.25rem;font-size:.88rem;color:rgba(255,255,255,.5);}
+    .footer-links a{color:var(--accent);text-decoration:none;font-weight:600;}
+    .footer-links a:hover{text-decoration:underline;}
+    .back-home{display:block;text-align:center;margin-top:1rem;color:rgba(255,255,255,.4);font-size:.82rem;text-decoration:none;}
+    .back-home:hover{color:var(--accent);}
+  </style>
+</head>
+<body>
+
+<div class="login-wrap">
+  <a href="index.html" class="logo"><span>KT</span>KilimoTrack</a>
+
+  <div class="card">
+    <h1>Welcome Back</h1>
+    <p class="sub">Log in to your KilimoTrack account</p>
+
+    <!-- Account type toggle -->
+    <div class="toggle">
+      <button id="btn-farmer" class="active" onclick="switchMode('farmer')">🧑‍🌾 Farmer</button>
+      <button id="btn-org"    onclick="switchMode('org')">🏛️ Organization</button>
+    </div>
+
+    <div class="alert error"   id="login-error"></div>
+    <div class="alert success" id="login-success"></div>
+
+    <!-- Farmer login -->
+    <form id="form-farmer" onsubmit="doLogin(event,'farmer')">
+      <div class="form-group">
+        <label for="farmer-phone">Phone Number</label>
+        <input type="tel" id="farmer-phone" placeholder="+254 7XX XXX XXX" required/>
+      </div>
+      <div class="form-group">
+        <label for="farmer-pass">Password</label>
+        <input type="password" id="farmer-pass" placeholder="Your password" required/>
+      </div>
+      <button type="submit" class="btn-submit" id="login-btn">🌱 Log In as Farmer</button>
+    </form>
+
+    <!-- Org login (hidden by default) -->
+    <form id="form-org" style="display:none;" onsubmit="doLogin(event,'org')">
+      <div class="form-group">
+        <label for="org-email">Organization Email</label>
+        <input type="email" id="org-email" placeholder="office@org.go.ke" required/>
+      </div>
+      <div class="form-group">
+        <label for="org-pass">Password</label>
+        <input type="password" id="org-pass" placeholder="Your password" required/>
+      </div>
+      <button type="submit" class="btn-submit" id="login-btn-org">🏛️ Log In as Organization</button>
+    </form>
+
+    <div class="footer-links">Don't have an account? <a href="register.html">Sign up free</a></div>
+  </div>
+
+  <a href="index.html" class="back-home">← Back to Home</a>
+</div>
+
+<script>
+  const API = 'http://localhost/kilimotrack/api';
+
+  // Redirect if already logged in
+  if (localStorage.getItem('kt_token') && localStorage.getItem('kt_user')) {
+    window.location.href = 'dashboard.html';
+  }
+
+  function switchMode(mode) {
+    const isFarmer = mode === 'farmer';
+    document.getElementById('btn-farmer').classList.toggle('active', isFarmer);
+    document.getElementById('btn-org').classList.toggle('active', !isFarmer);
+    document.getElementById('form-farmer').style.display = isFarmer ? 'block' : 'none';
+    document.getElementById('form-org').style.display    = isFarmer ? 'none'  : 'block';
+    clearAlerts();
+  }
+
+  function clearAlerts() {
+    ['login-error','login-success'].forEach(id => {
+      const el = document.getElementById(id);
+      el.className = el.className.replace(' visible','');
+    });
+  }
+  function showAlert(id, msg, type) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = `alert ${type} visible`;
+  }
+
+  async function doLogin(e, mode) {
+    e.preventDefault();
+    clearAlerts();
+
+    const isFarmer = mode === 'farmer';
+    const btn = document.getElementById(isFarmer ? 'login-btn' : 'login-btn-org');
+    btn.disabled = true;
+    btn.textContent = '⏳ Logging in…';
+
+    let endpoint, payload;
+    if (isFarmer) {
+      endpoint = `${API}/farmers/login.php`;
+      payload  = {
+        phone:    document.getElementById('farmer-phone').value.trim(),
+        password: document.getElementById('farmer-pass').value
+      };
+    } else {
+      endpoint = `${API}/organizations/login.php`;
+      payload  = {
+        contact_email: document.getElementById('org-email').value.trim(),
+        password:      document.getElementById('org-pass').value
+      };
+    }
+
+    try {
+      const res  = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json();
+      if (json.success) {
+        const userObj = json.farmer || json.organization;
+        localStorage.setItem('kt_token',        json.token);
+        localStorage.setItem('kt_user',         JSON.stringify(userObj));
+        localStorage.setItem('kt_account_type', isFarmer ? 'farmer' : 'organization');
+        showAlert('login-success', '✅ Login successful! Redirecting…', 'success');
+        setTimeout(() => window.location.href = 'dashboard.html', 1200);
+      } else {
+        showAlert('login-error', '❌ ' + json.message, 'error');
+        btn.disabled = false;
+        btn.textContent = isFarmer ? '🌱 Log In as Farmer' : '🏛️ Log In as Organization';
+      }
+    } catch (err) {
+      showAlert('login-error', '❌ Cannot reach server. Make sure XAMPP Apache is running.', 'error');
+      btn.disabled = false;
+      btn.textContent = isFarmer ? '🌱 Log In as Farmer' : '🏛️ Log In as Organization';
+    }
+  }
+</script>
+</body>
+</html>

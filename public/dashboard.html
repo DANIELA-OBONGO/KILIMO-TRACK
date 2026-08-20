@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KilimoTrack — Farmer Dashboard</title>
+  <meta name="description" content="Your KilimoTrack smart farming dashboard — real data from your farm records."/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --text:#eef8ff;--panel:rgba(18,24,18,.55);--border:rgba(255,255,255,.15);
+      --accent:#90e0ef;--accent-dark:#62b6cb;--danger:#ff6b6b;
+      --warning:#ffd166;--success:#95e1d3;--dark-bg:#041f32;
+    }
+    *{box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{
+      margin:0;min-height:100vh;font-family:'Inter',system-ui,sans-serif;
+      color:var(--text);
+      background:radial-gradient(circle at top left,rgba(144,224,239,.16),transparent 24%),
+                 radial-gradient(circle at bottom right,rgba(255,255,255,.10),transparent 18%),
+                 linear-gradient(135deg,#041f32 0%,#082631 40%,#0c2a3a 100%);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";position:fixed;inset:0;
+      background-image:url("images/ChatGPT Image Jun 23, 2026, 10_21_59 AM.png");
+      background-position:center top;background-size:cover;
+      opacity:0.65;filter:saturate(1.2) contrast(1.05);z-index:-2;
+    }
+    body::after{content:"";position:fixed;inset:0;background:rgba(4,31,50,.15);z-index:-1;}
+
+    /* NAV */
+    nav{background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);backdrop-filter:blur(20px);padding:1rem 2rem;position:sticky;top:0;z-index:50;}
+    nav .nav-container{width:min(1400px,calc(100% - 2rem));margin:0 auto;display:flex;justify-content:space-between;align-items:center;}
+    nav .logo{display:flex;align-items:center;gap:.75rem;font-weight:700;font-size:1.3rem;text-decoration:none;color:var(--text);}
+    nav .logo span{width:40px;height:40px;display:grid;place-items:center;border-radius:10px;background:rgba(144,224,239,.18);color:#0b3b47;font-weight:800;font-size:.9rem;}
+    nav .nav-links{display:flex;gap:1.5rem;align-items:center;}
+    nav .nav-links a{color:rgba(255,255,255,.7);text-decoration:none;font-weight:500;transition:color .2s;}
+    nav .nav-links a:hover{color:var(--accent);}
+    .btn-logout{background:rgba(255,107,107,.15);color:#ff6b6b;padding:.6rem 1.4rem;border-radius:8px;border:1px solid rgba(255,107,107,.25);cursor:pointer;font-weight:600;transition:all .2s;text-decoration:none;font-family:inherit;font-size:.9rem;}
+    .btn-logout:hover{background:rgba(255,107,107,.25);}
+    .btn-marketplace{background:rgba(144,224,239,.15);color:var(--accent);padding:.6rem 1.4rem;border-radius:8px;border:1px solid rgba(144,224,239,.25);text-decoration:none;font-weight:600;font-size:.9rem;transition:all .2s;}
+    .btn-marketplace:hover{background:rgba(144,224,239,.25);}
+
+    /* CONTAINER */
+    .container{width:min(1400px,calc(100% - 2rem));margin:0 auto;padding:2rem 0;}
+
+    /* PROFILE HEADER */
+    .profile-header{background:var(--panel);border:1px solid var(--border);border-radius:24px;backdrop-filter:blur(20px);padding:2.5rem;margin-bottom:2rem;display:grid;grid-template-columns:auto 1fr auto;gap:2rem;align-items:center;}
+    .farmer-avatar{width:120px;height:120px;border-radius:16px;background:linear-gradient(135deg,var(--accent-dark),var(--accent));display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:700;}
+    .profile-info h1{margin:0 0 .5rem;font-size:2rem;font-family:'Playfair Display',serif;}
+    .profile-info p{margin:.25rem 0;color:rgba(255,255,255,.65);font-size:.95rem;}
+    .profile-stats{display:flex;gap:2rem;}
+    .stat-item{text-align:center;}
+    .stat-value{font-size:1.8rem;font-weight:700;color:var(--accent);display:block;}
+    .stat-label{font-size:.85rem;color:rgba(255,255,255,.55);margin-top:.25rem;}
+
+    /* GRID */
+    .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-bottom:2rem;}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:18px;backdrop-filter:blur(8px);padding:2rem;transition:all .3s ease;}
+    .card:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2);transform:translateY(-4px);}
+    .card h2{margin:0 0 1.5rem;font-size:1.2rem;display:flex;align-items:center;gap:.75rem;}
+    .card.season h2::before{content:'🌱';}
+    .card.soil h2::before{content:'🧪';}
+    .card.pest h2::before{content:'🐛';}
+
+    /* STAT CARDS */
+    .stat-card{background:linear-gradient(135deg,rgba(8,28,40,.5),rgba(8,28,40,.35));border:1px solid rgba(144,224,239,.2);border-radius:14px;padding:1.5rem;margin-bottom:1rem;}
+    .stat-card-title{color:rgba(255,255,255,.65);font-size:.85rem;margin-bottom:.5rem;font-weight:500;}
+    .stat-card-value{font-size:2.2rem;font-weight:700;color:var(--accent);}
+    .stat-card-sub{color:rgba(255,255,255,.5);font-size:.8rem;margin-top:.25rem;}
+
+    /* LOG ENTRIES */
+    .log-entry{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:1.25rem;margin-bottom:1rem;display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;}
+    .log-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;background:rgba(144,224,239,.15);}
+    .log-content h4{margin:0 0 .25rem;font-size:.95rem;}
+    .log-content p{margin:0;color:rgba(255,255,255,.55);font-size:.85rem;}
+    .log-date{text-align:right;color:rgba(255,255,255,.45);font-size:.8rem;}
+
+    /* BADGE */
+    .badge{display:inline-block;padding:.4rem .9rem;border-radius:100px;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-right:.5rem;margin-bottom:.5rem;}
+    .badge.success{background:rgba(149,225,211,.2);color:var(--success);}
+    .badge.warning{background:rgba(255,209,102,.2);color:var(--warning);}
+    .badge.danger{background:rgba(255,107,107,.2);color:var(--danger);}
+    .badge.info{background:rgba(144,224,239,.2);color:var(--accent);}
+
+    /* pH SCALE */
+    .ph-scale{display:flex;gap:.5rem;margin:1rem 0;height:30px;}
+    .ph-bar{flex:1;border-radius:4px;}
+    .ph-acid{background:linear-gradient(135deg,#ff6b6b,#ff8787);}
+    .ph-neutral{background:linear-gradient(135deg,#95e1d3,#b8f3e6);}
+    .ph-alkaline{background:linear-gradient(135deg,#4ecdc4,#44b7aa);}
+
+    /* TABLE */
+    .pest-table{width:100%;border-collapse:collapse;}
+    .pest-table thead{border-bottom:1px solid rgba(255,255,255,.15);}
+    .pest-table th{text-align:left;padding:.75rem 0;color:rgba(255,255,255,.6);font-weight:600;font-size:.85rem;}
+    .pest-table td{padding:1rem 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:.95rem;}
+    .pest-severity{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:.5rem;}
+    .severity-low{background:var(--success);}
+    .severity-medium{background:var(--warning);}
+    .severity-high{background:var(--danger);}
+
+    .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;}
+
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(4,31,50,.7);backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem;}
+    .modal-overlay.open{display:flex;}
+    .modal{background:#082631;border:1px solid var(--border);border-radius:22px;padding:2.5rem;width:min(560px,100%);max-height:90vh;overflow-y:auto;position:relative;animation:slideUp .3s ease;}
+    @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+    .modal h3{margin:0 0 1.5rem;font-size:1.3rem;}
+    .modal-close{position:absolute;top:1rem;right:1.25rem;background:none;border:none;color:rgba(255,255,255,.5);font-size:1.4rem;cursor:pointer;}
+    .modal-close:hover{color:#fff;}
+    .mform-group{margin-bottom:1.1rem;}
+    .mform-group label{display:block;font-size:.83rem;font-weight:600;margin-bottom:.4rem;color:rgba(255,255,255,.7);}
+    .mform-group input,.mform-group select,.mform-group textarea{width:100%;padding:.75rem 1rem;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--text);font-family:inherit;font-size:.9rem;outline:none;transition:border-color .2s;}
+    .mform-group input:focus,.mform-group select:focus,.mform-group textarea:focus{border-color:var(--accent);}
+    .mform-group select option{background:#0c2a3a;}
+    .mform-group textarea{min-height:80px;resize:vertical;}
+    .modal-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    .btn-modal-submit{width:100%;padding:.9rem;border-radius:10px;border:none;background:linear-gradient(135deg,var(--accent-dark),var(--accent));color:#041f32;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;margin-top:.5rem;transition:all .2s;}
+    .btn-modal-submit:hover{filter:brightness(1.1);}
+    .btn-modal-submit:disabled{opacity:.6;cursor:not-allowed;}
+    .modal-alert{padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:.87rem;display:none;}
+    .modal-alert.error{background:rgba(255,107,107,.15);border:1px solid rgba(255,107,107,.3);color:#ff6b6b;}
+    .modal-alert.success{background:rgba(149,225,211,.15);border:1px solid rgba(149,225,211,.3);color:var(--success);}
+    .modal-alert.show{display:block;}
+
+    /* ACTION BUTTONS */
+    .action-btn{width:100%;padding:.85rem;margin-bottom:.75rem;border-radius:10px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;font-size:.9rem;border:1px solid;}
+
+    /* SKELETON LOADING */
+    .skeleton{background:rgba(255,255,255,.06);border-radius:6px;animation:shimmer 1.5s infinite;}
+    @keyframes shimmer{0%,100%{opacity:.5}50%{opacity:1}}
+
+    /* MARKETPLACE PREVIEW CARD */
+    .listing-mini{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:1rem;margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;}
+    .listing-mini-name{font-weight:600;font-size:.95rem;margin:0 0 .2rem;}
+    .listing-mini-meta{color:rgba(255,255,255,.5);font-size:.82rem;}
+    .listing-mini-price{color:var(--accent);font-weight:700;font-size:1rem;white-space:nowrap;}
+
+    footer{margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border);text-align:center;color:rgba(255,255,255,.45);font-size:.9rem;}
+    @media(max-width:768px){
+      .profile-header{grid-template-columns:1fr;text-align:center;}
+      .profile-stats{justify-content:space-around;}
+      nav .nav-links{gap:.75rem;}
+      .dashboard-grid,.grid-2{grid-template-columns:1fr;}
+      .modal-row{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-container">
+    <a href="index.html" class="logo"><span>KT</span>KilimoTrack</a>
+    <div class="nav-links">
+      <a href="#dashboard">Dashboard</a>
+      <a href="marketplace.html" class="btn-marketplace">🛒 Marketplace</a>
+      <button class="btn-logout" onclick="logout()">⟵ Logout</button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="container" id="dashboard">
+
+  <!-- PROFILE HEADER -->
+  <div class="profile-header" id="profile">
+    <div class="farmer-avatar" id="avatar-icon">🚜</div>
+    <div class="profile-info">
+      <h1 id="user-name">Loading…</h1>
+      <p id="user-farm"></p>
+      <p id="user-location"></p>
+      <p id="user-contact"></p>
+    </div>
+    <div class="profile-stats">
+      <div class="stat-item"><span class="stat-value" id="stat-seasons">—</span><span class="stat-label">Seasons</span></div>
+      <div class="stat-item"><span class="stat-value" id="stat-soil">—</span><span class="stat-label">Soil Tests</span></div>
+      <div class="stat-item"><span class="stat-value" id="stat-pests">—</span><span class="stat-label">Pest Records</span></div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="dashboard-grid">
+
+    <!-- SEASON TRACKER -->
+    <div class="card season" id="season-card">
+      <h2>Season Tracker</h2>
+      <div id="season-content">
+        <div class="stat-card skeleton" style="height:80px;"></div>
+        <div class="stat-card skeleton" style="height:60px;margin-top:1rem;"></div>
+      </div>
+    </div>
+
+    <!-- SOIL ACIDITY -->
+    <div class="card soil" id="soil-card">
+      <h2>Soil Acidity (pH)</h2>
+      <div id="soil-content">
+        <div class="stat-card skeleton" style="height:80px;"></div>
+      </div>
+    </div>
+
+    <!-- PEST ALERTS -->
+    <div class="card pest" id="pest-card">
+      <h2>Pest Alerts</h2>
+      <div id="pest-content">
+        <div class="log-entry skeleton" style="height:70px;"></div>
+      </div>
+    </div>
+
+    <!-- RECENT ACTIVITY -->
+    <div class="card">
+      <h2>⏱️ Recent Activity</h2>
+      <div id="activity-content">
+        <div class="log-entry skeleton" style="height:70px;"></div>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="card">
+      <h2>🚀 Quick Actions</h2>
+      <p style="color:rgba(255,255,255,.65);margin:0 0 1rem;font-size:.9rem;">Add records to your farm</p>
+      <button class="action-btn" style="background:rgba(255,107,107,.2);border-color:var(--danger);color:var(--danger);" onclick="openModal('pest-modal')">+ Log Pest Outbreak</button>
+      <button class="action-btn" style="background:rgba(149,225,211,.2);border-color:var(--success);color:var(--success);" onclick="openModal('soil-modal')">+ Record Soil Test</button>
+      <button class="action-btn" style="background:rgba(144,224,239,.2);border-color:var(--accent);color:var(--accent);" onclick="openModal('farm-modal')">+ New Farm Record</button>
+      <button class="action-btn" style="background:rgba(255,209,102,.2);border-color:var(--warning);color:var(--warning);" onclick="openModal('listing-modal')">🛒 List Product for Sale</button>
+    </div>
+
+    <!-- MY MARKETPLACE LISTINGS -->
+    <div class="card" id="listings-card">
+      <h2>🛒 My Listings</h2>
+      <div id="listings-content">
+        <div class="log-entry skeleton" style="height:60px;"></div>
+      </div>
+      <a href="marketplace.html" style="display:block;text-align:center;margin-top:1rem;color:var(--accent);font-size:.85rem;text-decoration:none;font-weight:600;">Browse Full Marketplace →</a>
+    </div>
+
+  </div><!-- /dashboard-grid -->
+
+  <!-- DETAILED RECORDS -->
+  <div class="grid-2">
+
+    <!-- PEST LOG TABLE -->
+    <div class="card">
+      <h2>🐛 Pest Outbreak Log</h2>
+      <table class="pest-table">
+        <thead><tr><th>Pest Type</th><th>Date</th><th>Severity</th><th>Status</th></tr></thead>
+        <tbody id="pest-table-body"><tr><td colspan="4" style="color:rgba(255,255,255,.4);padding:1rem 0;">Loading…</td></tr></tbody>
+      </table>
+    </div>
+
+    <!-- SOIL pH HISTORY -->
+    <div class="card">
+      <h2>🧪 Soil pH History</h2>
+      <table class="pest-table">
+        <thead><tr><th>Date</th><th>Field</th><th>pH</th><th>Status</th></tr></thead>
+        <tbody id="soil-table-body"><tr><td colspan="4" style="color:rgba(255,255,255,.4);padding:1rem 0;">Loading…</td></tr></tbody>
+      </table>
+    </div>
+
+    <!-- CONTACT REQUESTS FROM BUYERS -->
+    <div class="card" id="contact-requests-card" style="display:none;">
+      <h2>📬 Buyer Contact Requests</h2>
+      <div id="contact-requests-content">
+        <p style="color:rgba(255,255,255,.45);font-size:.9rem;">Loading requests…</p>
+      </div>
+    </div>
+
+  </div><!-- /grid-2 -->
+
+</div><!-- /container -->
+
+<footer>© 2026 KilimoTrack — kilimo taji . kilimo yenye mapato</footer>
+
+<!-- ============================================================ -->
+<!-- MODALS                                                        -->
+<!-- ============================================================ -->
+
+<!-- PEST LOG MODAL -->
+<div class="modal-overlay" id="pest-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('pest-modal')">✕</button>
+    <h3>🐛 Log Pest Outbreak</h3>
+    <div class="modal-alert error" id="pest-modal-error"></div>
+    <div class="modal-alert success" id="pest-modal-success"></div>
+    <form onsubmit="submitPest(event)">
+      <div class="modal-row">
+        <div class="mform-group">
+          <label>Pest Name *</label>
+          <input type="text" id="pm-pest-name" placeholder="e.g. Fall Armyworm" required/>
+        </div>
+        <div class="mform-group">
+          <label>Field Name</label>
+          <input type="text" id="pm-field" placeholder="e.g. Field A"/>
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="mform-group">
+          <label>Severity *</label>
+          <select id="pm-severity">
+            <option value="Low">Low</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+        <div class="mform-group">
+          <label>Date Observed *</label>
+          <input type="date" id="pm-date" required/>
+        </div>
+      </div>
+      <div class="mform-group">
+        <label>Treatment Applied</label>
+        <input type="text" id="pm-treatment" placeholder="e.g. Applied Emamectin Benzoate"/>
+      </div>
+      <div class="mform-group">
+        <label>Status</label>
+        <select id="pm-status"><option value="Active">Active</option><option value="Resolved">Resolved</option></select>
+      </div>
+      <button type="submit" class="btn-modal-submit" id="pest-submit-btn">Log Pest Outbreak</button>
+    </form>
+  </div>
+</div>
+
+<!-- SOIL RECORD MODAL -->
+<div class="modal-overlay" id="soil-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('soil-modal')">✕</button>
+    <h3>🧪 Record Soil Test</h3>
+    <div class="modal-alert error" id="soil-modal-error"></div>
+    <div class="modal-alert success" id="soil-modal-success"></div>
+    <form onsubmit="submitSoil(event)">
+      <div class="modal-row">
+        <div class="mform-group">
+          <label>Field Name</label>
+          <input type="text" id="sm-field" placeholder="e.g. Field A"/>
+        </div>
+        <div class="mform-group">
+          <label>Test Date *</label>
+          <input type="date" id="sm-date" required/>
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="mform-group">
+          <label>pH Level * (0–14)</label>
+          <input type="number" id="sm-ph" placeholder="e.g. 6.4" step="0.1" min="0" max="14" required/>
+        </div>
+        <div class="mform-group">
+          <label>Soil Type</label>
+          <input type="text" id="sm-soil-type" placeholder="e.g. Loamy"/>
+        </div>
+      </div>
+      <div class="mform-group">
+        <label>Moisture Level</label>
+        <select id="sm-moisture">
+          <option value="">— Select —</option>
+          <option>Low</option><option>Moderate</option><option>High</option>
+        </select>
+      </div>
+      <div class="mform-group">
+        <label>Notes</label>
+        <textarea id="sm-notes" placeholder="Any additional observations…"></textarea>
+      </div>
+      <button type="submit" class="btn-modal-submit" id="soil-submit-btn">Save Soil Record</button>
+    </form>
+  </div>
+</div>
+
+<!-- FARM RECORD MODAL -->
+<div class="modal-overlay" id="farm-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('farm-modal')">✕</button>
+    <h3>🌱 New Farm Record</h3>
+    <div class="modal-alert error" id="farm-modal-error"></div>
+    <div class="modal-alert success" id="farm-modal-success"></div>
+    <form onsubmit="submitFarm(event)">
+      <div class="modal-row">
+        <div class="mform-group">
+          <label>Crop Type *</label>
+          <input type="text" id="fm-crop" placeholder="e.g. Maize" required/>
+        </div>
+        <div class="mform-group">
+          <label>Field Name</label>
+          <input type="text" id="fm-field" placeholder="e.g. Field A"/>
+        </div>
+      </div>
+      <div class="mform-group">
+        <label>Season Type *</label>
+        <select id="fm-season">
+          <option>Long Rains</option><option>Short Rains</option>
+          <option>Dry Season</option><option>Irrigation</option>
+        </select>
+      </div>
+      <div class="modal-row">
+        <div class="mform-group">
+          <label>Planting Date *</label>
+          <input type="date" id="fm-plant-date" required/>
+        </div>
+        <div class="mform-group">
+          <label>Expected Harvest Date</label>
+          <input type="date" id="fm-harvest-date"/>
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="mform-group">
+          <label>Growth Stage</label>
+          <input type="text" id="fm-stage" placeholder="e.g. Tasseling"/>
+        </div>
+        <div class="mform-group">
+          <label>Acreage</label>
+          <input type="number" id="fm-acreage" placeholder="e.g. 2.5" step="0.1" min="0"/>
+        </div>
+      </div>
+      <div class="mform-group">
+        <label>Notes</label>
+        <textarea id="fm-notes" placeholder="Any additional notes…"></textarea>
+      </div>
+      <button type="submit" class="btn-modal-submit" id="farm-submit-btn">Save Farm Record</button>
+    </form>
+  </div>
+</div>
+
+<!-- LIST PRODUCT MODAL -->
+<div class="modal-overlay" id="listing-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('listing-modal')">✕</button>
+    <h3>🛒 List Product for Sale</h3>
+    <div class="modal-alert error" id="listing-modal-error"></div>
+    <div class="modal-alert success" id="listing-modal-success"></div>
+    <form onsubmit="submitListing(event)">
+      <div class="mform-group">
+        <label>Product Name *</label>
+        <input type="text" id="lm-name" placeholder="e.g. Fresh Maize (Dry)" required/>
+      </div>
+      <div class="modal-row">
+        <div class="mform-group">
+          <label>Category</label>
+          <select id="lm-category">
+            <option value="">— Select —</option>
+            <option>Grains</option><option>Legumes</option><option>Vegetables</option>
+            <option>Fruits</option><option>Tubers &amp; Roots</option><option>Dairy</option>
+            <option>Poultry</option><option>Livestock</option><option>Other</option>
+          </select>
+        </div>
+        <div class="mform-group">
+          <label>Location</label>
+          <input type="text" id="lm-location" placeholder="e.g. Nakuru County"/>
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="mform-group">
+          <label>Quantity</label>
+          <input type="number" id="lm-qty" placeholder="e.g. 200" step="0.1" min="0"/>
+        </div>
+        <div class="mform-group">
+          <label>Unit</label>
+          <select id="lm-unit">
+            <option value="">— Select —</option>
+            <option>kg</option><option>bags</option><option>tonnes</option>
+            <option>litres</option><option>crates</option><option>pieces</option><option>bunches</option>
+          </select>
+        </div>
+      </div>
+      <div class="mform-group">
+        <label>Price per Unit (KES)</label>
+        <input type="number" id="lm-price" placeholder="e.g. 45" step="0.01" min="0"/>
+      </div>
+      <div class="mform-group">
+        <label>Description</label>
+        <textarea id="lm-desc" placeholder="Describe your product — quality, harvest date, etc."></textarea>
+      </div>
+      <button type="submit" class="btn-modal-submit" id="listing-submit-btn">🛒 List Product</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT                                                     -->
+<!-- ============================================================ -->
+<script>
+  // ── CONFIG ───────────────────────────────────────────────────────
+  // Change this ONE line to switch to a paid host:
+  const API = 'http://localhost/kilimotrack/api';
+
+  // ── Auth guard ────────────────────────────────────────────────────
+  const token       = localStorage.getItem('kt_token');
+  const userRaw     = localStorage.getItem('kt_user');
+  const accountType = localStorage.getItem('kt_account_type') || 'farmer';
+
+  if (!token || !userRaw) {
+    window.location.href = 'login.html';
+  }
+
+  const user     = JSON.parse(userRaw || '{}');
+  const farmerId = user.id || null;
+
+  // Shared auth headers for protected requests
+  const authHeaders = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + token
+  };
+
+  // ── Profile header ────────────────────────────────────────────────
+  function populateProfile() {
+    if (accountType === 'farmer') {
+      document.getElementById('avatar-icon').textContent = '🚜';
+      document.getElementById('user-name').textContent = user.name || 'Farmer';
+      document.getElementById('user-farm').innerHTML = user.farm_name ? `<strong>Farm:</strong> ${user.farm_name}` : '';
+      document.getElementById('user-location').innerHTML = user.location ? `<strong>Location:</strong> ${user.location}` : '';
+      document.getElementById('user-contact').innerHTML = user.phone ? `<strong>Contact:</strong> ${user.phone}` : '';
+    } else {
+      document.getElementById('avatar-icon').textContent = '🏛️';
+      document.getElementById('user-name').textContent = user.org_name || 'Organization';
+      document.getElementById('user-farm').innerHTML = `<strong>Type:</strong> ${user.org_type || ''}`;
+      document.getElementById('user-location').innerHTML = user.location ? `<strong>Location:</strong> ${user.location}` : '';
+      document.getElementById('user-contact').innerHTML = user.contact_email ? `<strong>Email:</strong> ${user.contact_email}` : '';
+      document.getElementById('stat-seasons').closest('.stat-item').style.display = 'none';
+    }
+  }
+
+  // ── Load all data ─────────────────────────────────────────────────
+  async function loadData() {
+    if (!farmerId || accountType !== 'farmer') {
+      loadOrgDashboard(); return;
+    }
+
+    const [farmRes, soilRes, pestRes, listingRes, crRes] = await Promise.all([
+      fetch(`${API}/farm_records/list.php`,  { headers: authHeaders }).then(r => r.json()).catch(() => null),
+      fetch(`${API}/soil_records/list.php`,  { headers: authHeaders }).then(r => r.json()).catch(() => null),
+      fetch(`${API}/pest_logs/list.php`,     { headers: authHeaders }).then(r => r.json()).catch(() => null),
+      fetch(`${API}/marketplace/listings/my_listings.php`, { headers: authHeaders }).then(r => r.json()).catch(() => null),
+      fetch(`${API}/marketplace/contact_requests/seller_requests.php`, { headers: authHeaders }).then(r => r.json()).catch(() => null),
+    ]);
+
+    // Stats
+    document.getElementById('stat-seasons').textContent = farmRes?.count ?? 0;
+    document.getElementById('stat-soil').textContent    = soilRes?.count ?? 0;
+    document.getElementById('stat-pests').textContent   = pestRes?.count ?? 0;
+
+    renderSeasonCard(farmRes?.records || []);
+    renderSoilCard(soilRes?.records || [], soilRes?.average_ph ?? null);
+    renderPestCard(pestRes?.records || []);
+    renderActivity(farmRes?.records || [], soilRes?.records || [], pestRes?.records || []);
+    renderPestTable(pestRes?.records || []);
+    renderSoilTable(soilRes?.records || []);
+    renderMyListings(listingRes?.listings || []);
+    renderContactRequests(crRes?.requests || []);
+  }
+
+  // ── Renderers ─────────────────────────────────────────────────────
+  function renderSeasonCard(records) {
+    const el = document.getElementById('season-content');
+    if (!records.length) {
+      el.innerHTML = `<p style="color:rgba(255,255,255,.45);text-align:center;padding:1rem 0;">No farm records yet.<br><small>Use Quick Actions to add your first season.</small></p>`;
+      return;
+    }
+    const latest = records[0];
+    el.innerHTML = `
+      <div class="stat-card">
+        <div class="stat-card-title">Latest Season</div>
+        <div class="stat-card-value">${latest.season_type}</div>
+        <div class="stat-card-sub">${formatDate(latest.planting_date)}${latest.harvest_date ? ' → ' + formatDate(latest.harvest_date) : ''}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">Primary Crop</div>
+        <div class="stat-card-value">${latest.crop_type}</div>
+        <div class="stat-card-sub">${latest.acreage ? latest.acreage + ' acres planted' : (latest.field_name || '')}</div>
+      </div>
+      ${latest.harvest_date ? `<div class="stat-card"><div class="stat-card-title">Expected Harvest</div><div class="stat-card-value">${formatDate(latest.harvest_date)}</div><div class="stat-card-sub">${latest.growth_stage || ''}</div></div>` : ''}
+    `;
+  }
+
+  function renderSoilCard(records, avgPh) {
+    const el = document.getElementById('soil-content');
+    if (!records.length) {
+      el.innerHTML = `<p style="color:rgba(255,255,255,.45);text-align:center;padding:1rem 0;">No soil tests yet.</p>`;
+      return;
+    }
+    const phLabel = avgPh < 5.5 ? 'Strongly Acidic' : avgPh < 6 ? 'Slightly Acidic' : avgPh <= 7 ? 'Optimal ✓' : avgPh <= 7.5 ? 'Slightly Alkaline' : 'Strongly Alkaline';
+    el.innerHTML = `
+      <div class="stat-card">
+        <div class="stat-card-title">Average pH</div>
+        <div class="stat-card-value">${avgPh ?? '—'}</div>
+        <div class="stat-card-sub">${phLabel}</div>
+      </div>
+      <p style="color:rgba(255,255,255,.65);font-size:.9rem;margin:.5rem 0;">pH Scale</p>
+      <div class="ph-scale">
+        <div class="ph-bar ph-acid"></div>
+        <div class="ph-bar ph-acid"></div>
+        <div class="ph-bar ph-neutral" style="${avgPh >= 6 && avgPh <= 7 ? 'border:2px solid var(--accent)' : ''}"></div>
+        <div class="ph-bar ph-neutral"></div>
+        <div class="ph-bar ph-alkaline"></div>
+      </div>
+      <p style="color:rgba(255,255,255,.5);font-size:.8rem;margin-top:1rem;">Last tested: ${formatDate(records[0].test_date)}</p>
+    `;
+  }
+
+  function renderPestCard(records) {
+    const el = document.getElementById('pest-content');
+    if (!records.length) {
+      el.innerHTML = `<p style="color:rgba(255,255,255,.45);text-align:center;padding:1rem 0;">No pest records yet. 🌿</p>`;
+      return;
+    }
+    el.innerHTML = records.slice(0, 3).map(p => `
+      <div class="log-entry" style="margin-bottom:.75rem;">
+        <div class="log-icon">${p.severity === 'High' ? '🚨' : p.severity === 'Medium' ? '🐛' : '🦟'}</div>
+        <div class="log-content"><h4>${p.pest_name}</h4><p>${p.field_name ? p.field_name + ' - ' : ''}${p.severity} severity</p></div>
+        <span class="badge ${p.status === 'Active' ? 'warning' : 'success'}">${p.status}</span>
+      </div>
+    `).join('');
+  }
+
+  function renderActivity(farms, soils, pests) {
+    const el = document.getElementById('activity-content');
+    const all = [
+      ...farms.map(r => ({ icon:'🌱', title:`Planted ${r.crop_type}`, sub: r.field_name || r.season_type, date: r.created_at })),
+      ...soils.map(r => ({ icon:'🧪', title:`Soil pH test — ${r.ph_level}`, sub: r.recommendation?.substring(0,55) + '…' || '', date: r.created_at })),
+      ...pests.map(r => ({ icon: r.severity === 'High' ? '🚨' : '🐛', title: `${r.pest_name} ${r.status === 'Resolved' ? 'resolved' : 'detected'}`, sub: r.field_name || '', date: r.created_at })),
+    ].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+
+    if (!all.length) { el.innerHTML = `<p style="color:rgba(255,255,255,.45);text-align:center;padding:1rem;">No activity yet.</p>`; return; }
+    el.innerHTML = all.map(a => `
+      <div class="log-entry">
+        <div class="log-icon">${a.icon}</div>
+        <div class="log-content"><h4>${a.title}</h4><p>${a.sub}</p></div>
+        <div class="log-date">${timeAgo(a.date)}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderPestTable(records) {
+    const tbody = document.getElementById('pest-table-body');
+    if (!records.length) { tbody.innerHTML = `<tr><td colspan="4" style="color:rgba(255,255,255,.4);padding:1rem 0;">No pest records yet</td></tr>`; return; }
+    tbody.innerHTML = records.map(r => `
+      <tr>
+        <td>${r.pest_name}</td>
+        <td>${formatDate(r.date_observed)}</td>
+        <td><span class="pest-severity severity-${r.severity.toLowerCase()}"></span>${r.severity}</td>
+        <td><span class="badge ${r.status === 'Active' ? 'warning' : 'success'}">${r.status}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  function renderSoilTable(records) {
+    const tbody = document.getElementById('soil-table-body');
+    if (!records.length) { tbody.innerHTML = `<tr><td colspan="4" style="color:rgba(255,255,255,.4);padding:1rem 0;">No soil tests yet</td></tr>`; return; }
+    tbody.innerHTML = records.map(r => {
+      const ph = parseFloat(r.ph_level);
+      const cls = ph < 5.5 ? 'danger' : ph <= 7 ? 'success' : 'info';
+      const lbl = ph < 5.5 ? 'Acidic' : ph <= 7 ? 'Optimal' : ph <= 7.5 ? 'Sl. Alkaline' : 'Alkaline';
+      return `<tr><td>${formatDate(r.test_date)}</td><td>${r.field_name || '—'}</td><td>${r.ph_level}</td><td><span class="badge ${cls}">${lbl}</span></td></tr>`;
+    }).join('');
+  }
+
+  function renderMyListings(listings) {
+    const el = document.getElementById('listings-content');
+    if (!listings.length) {
+      el.innerHTML = `<p style="color:rgba(255,255,255,.45);font-size:.9rem;text-align:center;padding:.5rem 0;">No listings yet. Use Quick Actions to list a product.</p>`;
+      return;
+    }
+    el.innerHTML = listings.slice(0, 4).map(l => `
+      <div class="listing-mini">
+        <div>
+          <div class="listing-mini-name">${l.product_name}</div>
+          <div class="listing-mini-meta">${l.category || ''} · ${l.quantity ? l.quantity + ' ' + (l.unit || '') : ''} · <span class="badge ${l.status === 'available' ? 'success' : 'info'}" style="font-size:.65rem;padding:.2rem .6rem;">${l.status}</span> ${l.contact_request_count > 0 ? `<span class="badge warning" style="font-size:.65rem;padding:.2rem .6rem;">📬 ${l.contact_request_count} request${l.contact_request_count > 1 ? 's' : ''}</span>` : ''}</div>
+        </div>
+        <div class="listing-mini-price">${l.price ? 'KES ' + parseFloat(l.price).toLocaleString() : '—'}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderContactRequests(requests) {
+    const card = document.getElementById('contact-requests-card');
+    const el   = document.getElementById('contact-requests-content');
+    if (!requests.length) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+    el.innerHTML = requests.map(r => `
+      <div class="log-entry" style="margin-bottom:.75rem;">
+        <div class="log-icon">📬</div>
+        <div class="log-content">
+          <h4>${r.buyer_name} — <em style="font-weight:400;font-size:.85rem;">${r.product_name}</em></h4>
+          <p>📞 ${r.buyer_phone} &nbsp;·&nbsp; ${r.message ? r.message.substring(0,60) + (r.message.length > 60 ? '…' : '') : 'No message'}</p>
+        </div>
+        <span class="badge ${r.status === 'pending' ? 'warning' : r.status === 'accepted' ? 'success' : 'info'}">${r.status}</span>
+      </div>
+    `).join('');
+  }
+
+  function loadOrgDashboard() {
+    document.getElementById('stat-soil').closest('.stat-item').textContent = '';
+    document.getElementById('stat-pests').closest('.stat-item').textContent = '';
+    document.getElementById('season-content').innerHTML = `<p style="color:rgba(255,255,255,.55);">Organization account. Use advisories to post alerts to farmers.</p>`;
+    document.getElementById('soil-content').innerHTML = '';
+    document.getElementById('pest-content').innerHTML = '';
+    document.getElementById('listings-content').innerHTML = '';
+    document.getElementById('activity-content').innerHTML = `<p style="color:rgba(255,255,255,.55);">Welcome, ${user.org_name || 'Organization'}!</p>`;
+  }
+
+  // ── MODAL HELPERS ─────────────────────────────────────────────────
+  function openModal(id)  { document.getElementById(id).classList.add('open'); setTodayDefaults(); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  function setTodayDefaults() {
+    const today = new Date().toISOString().split('T')[0];
+    ['pm-date','sm-date','fm-plant-date'].forEach(id => {
+      const el = document.getElementById(id); if (el && !el.value) el.value = today;
+    });
+  }
+
+  function showModalAlert(prefix, msg, type) {
+    const el = document.getElementById(`${prefix}-modal-${type}`);
+    el.textContent = msg; el.className = `modal-alert ${type} show`;
+  }
+  function clearModalAlerts(prefix) {
+    ['error','success'].forEach(t => {
+      const el = document.getElementById(`${prefix}-modal-${t}`);
+      if (el) el.className = `modal-alert ${t}`;
+    });
+  }
+
+  // ── SUBMIT PEST ───────────────────────────────────────────────────
+  async function submitPest(e) {
+    e.preventDefault(); clearModalAlerts('pest');
+    const btn = document.getElementById('pest-submit-btn');
+    btn.disabled = true; btn.textContent = '⏳ Saving…';
+    const data = {
+      pest_name: document.getElementById('pm-pest-name').value.trim(),
+      field_name: document.getElementById('pm-field').value.trim(),
+      severity: document.getElementById('pm-severity').value,
+      date_observed: document.getElementById('pm-date').value,
+      treatment_applied: document.getElementById('pm-treatment').value.trim(),
+      status: document.getElementById('pm-status').value,
+    };
+    try {
+      const res  = await fetch(`${API}/pest_logs/add.php`, { method:'POST', headers: authHeaders, body: JSON.stringify(data) });
+      const json = await res.json();
+      if (json.success) {
+        showModalAlert('pest','✅ Pest log saved!','success');
+        setTimeout(() => { closeModal('pest-modal'); loadData(); }, 1200);
+      } else showModalAlert('pest','❌ ' + json.message,'error');
+    } catch { showModalAlert('pest','❌ Cannot reach server. Is XAMPP running?','error'); }
+    btn.disabled = false; btn.textContent = 'Log Pest Outbreak';
+  }
+
+  // ── SUBMIT SOIL ───────────────────────────────────────────────────
+  async function submitSoil(e) {
+    e.preventDefault(); clearModalAlerts('soil');
+    const btn = document.getElementById('soil-submit-btn');
+    btn.disabled = true; btn.textContent = '⏳ Saving…';
+    const data = {
+      field_name: document.getElementById('sm-field').value.trim(),
+      test_date: document.getElementById('sm-date').value,
+      ph_level: document.getElementById('sm-ph').value,
+      soil_type: document.getElementById('sm-soil-type').value.trim(),
+      moisture_level: document.getElementById('sm-moisture').value,
+      notes: document.getElementById('sm-notes').value.trim(),
+    };
+    try {
+      const res  = await fetch(`${API}/soil_records/add.php`, { method:'POST', headers: authHeaders, body: JSON.stringify(data) });
+      const json = await res.json();
+      if (json.success) {
+        showModalAlert('soil', `✅ Saved! Recommendation: ${json.recommendation || ''}`, 'success');
+        setTimeout(() => { closeModal('soil-modal'); loadData(); }, 1500);
+      } else showModalAlert('soil','❌ ' + json.message,'error');
+    } catch { showModalAlert('soil','❌ Cannot reach server. Is XAMPP running?','error'); }
+    btn.disabled = false; btn.textContent = 'Save Soil Record';
+  }
+
+  // ── SUBMIT FARM ───────────────────────────────────────────────────
+  async function submitFarm(e) {
+    e.preventDefault(); clearModalAlerts('farm');
+    const btn = document.getElementById('farm-submit-btn');
+    btn.disabled = true; btn.textContent = '⏳ Saving…';
+    const data = {
+      crop_type: document.getElementById('fm-crop').value.trim(),
+      field_name: document.getElementById('fm-field').value.trim(),
+      season_type: document.getElementById('fm-season').value,
+      planting_date: document.getElementById('fm-plant-date').value,
+      harvest_date: document.getElementById('fm-harvest-date').value || null,
+      growth_stage: document.getElementById('fm-stage').value.trim(),
+      acreage: document.getElementById('fm-acreage').value || null,
+      notes: document.getElementById('fm-notes').value.trim(),
+    };
+    try {
+      const res  = await fetch(`${API}/farm_records/add.php`, { method:'POST', headers: authHeaders, body: JSON.stringify(data) });
+      const json = await res.json();
+      if (json.success) {
+        showModalAlert('farm','✅ Farm record saved!','success');
+        setTimeout(() => { closeModal('farm-modal'); loadData(); }, 1200);
+      } else showModalAlert('farm','❌ ' + json.message,'error');
+    } catch { showModalAlert('farm','❌ Cannot reach server. Is XAMPP running?','error'); }
+    btn.disabled = false; btn.textContent = 'Save Farm Record';
+  }
+
+  // ── SUBMIT LISTING ────────────────────────────────────────────────
+  async function submitListing(e) {
+    e.preventDefault(); clearModalAlerts('listing');
+    const btn = document.getElementById('listing-submit-btn');
+    btn.disabled = true; btn.textContent = '⏳ Saving…';
+    const data = {
+      product_name: document.getElementById('lm-name').value.trim(),
+      category:     document.getElementById('lm-category').value,
+      location:     document.getElementById('lm-location').value.trim(),
+      quantity:     document.getElementById('lm-qty').value || null,
+      unit:         document.getElementById('lm-unit').value,
+      price:        document.getElementById('lm-price').value || null,
+      description:  document.getElementById('lm-desc').value.trim(),
+    };
+    try {
+      const res  = await fetch(`${API}/marketplace/listings/add.php`, { method:'POST', headers: authHeaders, body: JSON.stringify(data) });
+      const json = await res.json();
+      if (json.success) {
+        showModalAlert('listing','✅ Product listed on marketplace!','success');
+        setTimeout(() => { closeModal('listing-modal'); loadData(); }, 1400);
+      } else showModalAlert('listing','❌ ' + json.message,'error');
+    } catch { showModalAlert('listing','❌ Cannot reach server. Is XAMPP running?','error'); }
+    btn.disabled = false; btn.textContent = '🛒 List Product';
+  }
+
+  // ── LOGOUT ────────────────────────────────────────────────────────
+  function logout() {
+    localStorage.removeItem('kt_token');
+    localStorage.removeItem('kt_user');
+    localStorage.removeItem('kt_account_type');
+    window.location.href = 'index.html';
+  }
+
+  // Close modal on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(o => {
+    o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+  });
+
+  // ── UTILS ─────────────────────────────────────────────────────────
+  function formatDate(str) {
+    if (!str) return '—';
+    const d = new Date(str); if (isNaN(d)) return str;
+    return d.toLocaleDateString('en-KE', { day:'numeric', month:'short', year:'numeric' });
+  }
+  function timeAgo(str) {
+    if (!str) return '';
+    const diff = Date.now() - new Date(str).getTime();
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return 'just now';
+    if (m < 60) return `${m}m ago`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h ago`;
+    const days = Math.floor(h / 24);
+    return days === 1 ? 'yesterday' : `${days} days ago`;
+  }
+
+  // ── BOOT ──────────────────────────────────────────────────────────
+  populateProfile();
+  loadData();
+</script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+:root {
+  --bg: #f7fafc;
+  --surface: #ffffff;
+  --text: #102a43;
+  --muted: #52616b;
+  --primary: #2c7a7b;
+  --primary-dark: #285e61;
+  --accent: #f6ad55;
+  --border: #e2e8f0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  /* page background image controlled here */
+  background-image: url("images/lucid-origin_Close-up_of_weathered_Kenyan_farmer_s_hands_planting_maize_seeds_in_freshly_till-0.jpg");
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  color: #ffffff;
+  line-height: 1.6;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.container {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--primary-dark);
+  text-decoration: none;
+}
+
+.main-nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.main-nav a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.95rem 1.4rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.hero {
+  position: relative;
+  min-height: calc(100vh - 6rem);
+  padding: 5rem 0 4rem;
+  color: white;
+  background-repeat: transparent;
+}
+
+
+
+.hero-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.hero-copy h1 {
+  font-size: clamp(2.5rem, 4vw, 4rem);
+  margin: 0;
+  color: white;
+}
+
+.hero-copy .eyebrow,
+.hero-text,
+.hero-actions .btn-secondary {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-text {
+  margin: 1.5rem 0;
+  max-width: 38rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.hero-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 1.25rem;
+  padding: 1.75rem;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  color: var(--muted);
+}
+
+.card-top strong {
+  font-size: 2rem;
+  color: var(--text);
+}
+
+.card-body p {
+  margin: 0 0 1rem;
+  color: var(--muted);
+}
+
+.card-body ul {
+  list-style: disc inside;
+  margin: 0;
+  padding: 0;
+  color: var(--text);
+}
+
+.features {
+  padding: 3rem 0;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.section-header h2 {
+  margin: 0.5rem 0 0;
+  font-size: 2rem;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.feature-card {
+  background: var(--surface);
+  padding: 2rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+}
+
+.feature-card h3 {
+  margin-top: 0;
+}
+
+.about {
+  padding: 3rem 0;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.about-list {
+  margin: 1.5rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.about-image .image-box {
+  min-height: 320px;
+  border-radius: 1.5rem;
+  background: linear-gradient(135deg, #dbeafe, #c7d2fe);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1e293b;
+  text-align: center;
+  font-weight: 600;
+  padding: 1.5rem;
+}
+
+
+.cta-content h2 {
+  margin: 0;
+}
+
+.site-footer {
+  padding: 2rem 0;
+  border-top: 1px solid var(--border);
+  background: white;
+  background-image: url("images/lucid-origin_Close-up_of_weathered_Kenyan_farmer_s_hands_planting_maize_seeds_in_freshly_till-0.jpg");
+}
+
+.footer-grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.footer-grid h3 {
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  .hero-grid,
+  .about-grid,
+  .feature-grid,
+  .cta-content,
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .main-nav {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .header-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero {
+    padding-top: 2rem;
+  }
+}
+
+/* --- Styles moved from kilimo-track.html (inline) --- */
+:root {
+  --text: #eef8ff;
+  --panel: rgba(255,255,255,.08);
+  --border: rgba(255,255,255,.13);
+  --accent: #90e0ef;
+  --accent-dark: #62b6cb;
+  --dark-green: #1B3A2D;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--text);
+  overflow-x: hidden;
+}
+body::before,
+body::after { display: none; }
+
+/* NAVBAR */
+nav {
+  background: transparent;
+  border-bottom: none;
+  backdrop-filter: none;
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+nav .nav-container {
+  width: min(1400px, calc(100% - 2rem));
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  color: #ffffff;
+  background: transparent;
+}
+.logo span {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: transparent;
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: none;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+nav .nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  color: rgba(255,255,255,.95);
+  font-size: 0.95rem;
+  background: transparent;
+}
+nav .nav-links a {
+  color: rgba(255,255,255,.98);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+nav .nav-links a:hover { color: rgba(212,247,255,0.95); }
+
+.container { width: min(1140px, calc(100% - 2rem)); margin: 0 auto; padding: 3rem 0 4rem; }
+header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
+
+.hero { margin-top: 3rem; max-width: 740px; background: transparent; }
+.hero h1 { margin: 0 0 1rem; font-size: clamp(2.8rem, 5vw, 4.2rem); line-height: 1.02; font-family: 'Playfair Display', serif; font-weight: 800; color: #ffffff; text-shadow: 0 3px 14px rgba(0,0,0,0.6); }
+.hero p { margin: 0 0 1.8rem; font-size: 1rem; line-height: 1.75; color: rgba(238,248,255,.88); }
+.cta-group { display: flex; flex-wrap: wrap; gap: 1rem; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: auto; padding: 0.35rem 0.6rem; border-radius: 6px; border: none; text-decoration: none; font-weight: 700; transition: color .15s ease; cursor: pointer; background: transparent; color: #ffffff; }
+.btn-primary, .btn-secondary { background: transparent !important; color: #ffffff !important; border: none !important; box-shadow: none !important; }
+.btn-primary:hover, .btn-secondary:hover { color: rgba(212,247,255,0.95); transform: none; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-top: 2.75rem; }
+.card { padding: 0.6rem 0; background: transparent; border: none; border-radius: 0; backdrop-filter: none; min-height: auto; transition: none; position: relative; overflow: visible; }
+.card-image { display: none; }
+.card:hover { transform: none; }
+.card h2 { margin: 0 0 0.35rem; font-size: 1.05rem; color: #ffffff; text-shadow: 0 2px 8px rgba(0,0,0,0.6); }
+.card p { margin: 0; line-height: 1.6; color: rgba(255,255,255,0.92); font-size: 0.95rem; text-shadow: 0 2px 6px rgba(0,0,0,0.5); }
+
+footer { margin-top: 3rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; border-top: none; padding-top: 1.5rem; color: rgba(255,255,255,0.9); font-size: 0.95rem; background: transparent; text-shadow: 0 2px 6px rgba(0,0,0,0.45); }
+
+.features-section { margin-top: 4rem; padding: 3rem 0; border-top: none; border-bottom: none; background: transparent; }
+.section-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin-bottom: 0.5rem; color: #ffffff; text-shadow: 0 3px 14px rgba(0,0,0,0.6); }
+.section-lead { color: rgba(255,255,255,.72); margin-bottom: 2rem; max-width: 500px; }
+
+@media (max-width: 900px) {
+  .container { padding: 2rem 0; }
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  nav { padding: 1rem; }
+  nav .nav-container { flex-direction: column; gap: 1rem; }
+  nav .nav-links { flex-direction: column; gap: 1rem; width: 100%; }
+  .hero h1 { font-size: 2rem; }
+  .container { padding: 1rem 0; }
+  .cta-group { flex-direction: column; }
+  .btn { width: 100%; }
+  .grid { grid-template-columns: 1fr; }
+  footer { flex-direction: column; }
+}
+
+/* End moved styles */

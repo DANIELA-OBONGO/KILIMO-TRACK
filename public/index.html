@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KilimoTrack — Smart Farming for Kenya</title>
+  <meta name="description" content="KilimoTrack — Opening Doors to Smarter Agriculture. Track your farm seasons, soil health, pest outbreaks and connect with the agricultural marketplace."/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    #kt-splash {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      overflow: hidden;
+      opacity: 1;
+      transition: opacity 0.8s ease;
+    }
+    #kt-splash.kt-fade-out { opacity: 0; pointer-events: none; }
+    #kt-splash.kt-hidden { display: none; }
+
+    #kt-splash::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("images/kilimo_bg.jpg");
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      opacity: 1;
+      transition: opacity 1s ease;
+      z-index: 0;
+    }
+    #kt-splash.kt-img-in::before { opacity: 0.55; }
+
+    #kt-splash::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(4, 31, 50, 0.45) 0%,
+        rgba(4, 31, 50, 0.72) 60%,
+        rgba(4, 31, 50, 0.9)  100%
+      );
+      z-index: 1;
+    }
+
+    #kt-splash-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .kt-splash-badge {
+      width: 80px;
+      height: 80px;
+      border-radius: 22px;
+      border: 2px solid rgba(144, 224, 239, 0.4);
+      background: rgba(144, 224, 239, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 800;
+      color: #90e0ef;
+      letter-spacing: -1px;
+      margin-bottom: 2rem;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+      backdrop-filter: blur(12px);
+    }
+    #kt-splash.kt-text-in .kt-splash-badge { opacity: 1; transform: scale(1); }
+
+    .kt-splash-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 8vw, 5.5rem);
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 0.06em;
+      line-height: 1;
+      text-shadow: 0 4px 30px rgba(0, 0, 0, 0.7);
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease 0.4s, transform 0.6s ease 0.4s;
+      margin-bottom: 0.75rem;
+    }
+    #kt-splash.kt-text-in .kt-splash-name { opacity: 1; transform: translateY(0); }
+
+    .kt-splash-vision {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(0.8rem, 2.2vw, 1.1rem);
+      font-weight: 600;
+      color: #90e0ef;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.6s ease 0.65s, transform 0.6s ease 0.65s;
+      margin-bottom: 1rem;
+    }
+    #kt-splash.kt-text-in .kt-splash-vision { opacity: 1; transform: translateY(0); }
+
+    .kt-splash-tagline {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(0.72rem, 1.8vw, 0.9rem);
+      font-weight: 500;
+      color: rgba(238, 248, 255, 0.65);
+      letter-spacing: 0.08em;
+      font-variant: normal;
+      text-transform: none;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.6s ease 0.85s, transform 0.6s ease 0.85s;
+      margin-bottom: 0;
+    }
+    #kt-splash.kt-text-in .kt-splash-tagline { opacity: 1; transform: translateY(0); }
+
+    .kt-splash-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #62b6cb, #90e0ef, #b8f3e6);
+      z-index: 3;
+      transition: width 2.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 12px rgba(144, 224, 239, 0.6);
+    }
+    #kt-splash.kt-bar-go .kt-splash-bar { width: 100%; }
+
+    .kt-splash-dots {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      display: flex;
+      gap: 0.5rem;
+      opacity: 0;
+      transition: opacity 0.4s ease 1s;
+    }
+    #kt-splash.kt-text-in .kt-splash-dots { opacity: 1; }
+    .kt-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(144, 224, 239, 0.5);
+      animation: ktPulse 1.4s ease-in-out infinite;
+    }
+    .kt-dot:nth-child(2) { animation-delay: 0.2s; }
+    .kt-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes ktPulse {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50%       { opacity: 1;   transform: scale(1.2); }
+    }
+
+    #kt-main-content { opacity: 0; transition: opacity 0.6s ease; }
+    #kt-main-content.kt-visible { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <div id="kt-splash" role="dialog" aria-label="KilimoTrack loading">
+    <div id="kt-splash-content">
+      <div class="kt-splash-badge">KT</div>
+      <div class="kt-splash-name">KILIMO TRACK</div>
+      <div class="kt-splash-vision">Opening Doors to Smarter Agriculture</div>
+      <div class="kt-splash-tagline">kilimo taji . kilimo yenye mapato</div>
+    </div>
+    <div class="kt-splash-bar"></div>
+    <div class="kt-splash-dots">
+      <span class="kt-dot"></span>
+      <span class="kt-dot"></span>
+      <span class="kt-dot"></span>
+    </div>
+  </div>
+
+  <div id="kt-main-content">
+
+    <nav>
+      <div class="nav-container">
+        <a href="index.html" class="logo"><span>KT</span>Kilimo Track</a>
+        <div class="nav-links">
+          <a href="features.html">Features</a>
+          <a href="how-it-works.html">How It Works</a>
+          <a href="marketplace.html" style="color:rgba(255,255,255,.98);text-decoration:none;font-weight:500;transition:color .2s;">🛒 Marketplace</a>
+          <a href="login.html" class="btn btn-secondary" style="padding: 0.6rem 1.6rem; min-height: auto; border-radius: 8px;">Login</a>
+          <a href="register.html" class="btn btn-primary" style="padding: 0.6rem 1.6rem; min-height: auto; border-radius: 8px;">Sign Up</a>
+          <a href="#" id="nav-dashboard-btn" class="btn btn-primary" style="padding: 0.6rem 1.6rem; min-height: auto; border-radius: 8px; display:none;">Dashboard →</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+
+      <section class="hero">
+        <h1>Smart Farming Starts with Good Data</h1>
+        <p>KilimoTrack helps you record planting seasons, monitor soil acidity, and log pest outbreaks — all in one modern dashboard. Track every aspect of your farm and grow smarter.</p>
+        <div class="cta-group">
+          <a href="#" id="hero-dashboard-btn" class="btn btn-primary">🌱 Open Dashboard</a>
+          <a href="features.html" class="btn btn-secondary">Learn More ↓</a>
+        </div>
+      </section>
+
+      <footer>
+        <div>Kilimo Track &copy; 2026</div>
+        <div>Smart Farming Companion for Kenya — kilimo taji . kilimo yenye mapato</div>
+      </footer>
+    </div>
+
+  </div>
+
+  <script>
+    (function () {
+      const splash  = document.getElementById('kt-splash');
+      const main    = document.getElementById('kt-main-content');
+
+      function setupDashboardButtons() {
+        const isLoggedIn = !!(localStorage.getItem('kt_token') && localStorage.getItem('kt_user'));
+        const heroBtn  = document.getElementById('hero-dashboard-btn');
+        const navBtn   = document.getElementById('nav-dashboard-btn');
+
+        if (isLoggedIn) {
+          heroBtn.href = 'dashboard.html';
+          navBtn.style.display = 'inline-flex';
+          navBtn.href = 'dashboard.html';
+        } else {
+          heroBtn.href = 'login.html';
+          heroBtn.textContent = '🌱 Get Started';
+        }
+      }
+
+      function runSplash() {
+        requestAnimationFrame(() => { splash.classList.add('kt-img-in'); });
+        setTimeout(() => { splash.classList.add('kt-text-in'); }, 300);
+        setTimeout(() => { splash.classList.add('kt-bar-go'); }, 400);
+        setTimeout(() => {
+          splash.classList.add('kt-fade-out');
+          main.classList.add('kt-visible');
+        }, 5000);
+        setTimeout(() => { splash.classList.add('kt-hidden'); }, 5800);
+      }
+
+      if (sessionStorage.getItem('kt_splash_shown')) {
+        splash.classList.add('kt-hidden');
+        main.classList.add('kt-visible');
+      } else {
+        sessionStorage.setItem('kt_splash_shown', '1');
+        runSplash();
+      }
+
+      setTimeout(setupDashboardButtons, 100);
+    })();
+  </script>
+
+</body>
+</html>

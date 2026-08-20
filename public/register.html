@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KilimoTrack — Create Account</title>
+  <meta name="description" content="Sign up for KilimoTrack — Smart Farming for Kenya. Choose your account type to get started."/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --text: #eef8ff;
+      --panel: rgba(18,24,18,.55);
+      --border: rgba(255,255,255,.15);
+      --accent: #90e0ef;
+      --accent-dark: #62b6cb;
+      --danger: #ff6b6b;
+      --success: #95e1d3;
+      --warning: #ffd166;
+      --dark-bg: #041f32;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{
+      min-height:100vh;
+      font-family:'Inter',system-ui,sans-serif;
+      color:var(--text);
+      background:radial-gradient(circle at top left,rgba(144,224,239,.16),transparent 24%),
+                 radial-gradient(circle at bottom right,rgba(255,255,255,.10),transparent 18%),
+                 linear-gradient(135deg,#041f32 0%,#082631 40%,#0c2a3a 100%);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";position:fixed;inset:0;
+      background-image:url("images/ChatGPT Image Jun 23, 2026, 10_21_59 AM.png");
+      background-position:center;background-size:cover;
+      opacity:0.55;filter:saturate(1.2) contrast(1.05);z-index:-2;
+    }
+    body::after{content:"";position:fixed;inset:0;background:rgba(4,31,50,.25);z-index:-1;}
+
+    /* NAV */
+    nav{background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);backdrop-filter:blur(20px);padding:1rem 2rem;position:sticky;top:0;z-index:50;}
+    .nav-container{width:min(1200px,calc(100% - 2rem));margin:0 auto;display:flex;justify-content:space-between;align-items:center;}
+    .logo{display:flex;align-items:center;gap:.75rem;font-weight:700;font-size:1.3rem;text-decoration:none;color:var(--text);}
+    .logo span{width:40px;height:40px;display:grid;place-items:center;border-radius:10px;background:rgba(144,224,239,.18);color:#0b3b47;font-weight:800;font-size:.9rem;}
+    .nav-links{display:flex;gap:1.5rem;align-items:center;}
+    .nav-links a{color:rgba(255,255,255,.7);text-decoration:none;font-weight:500;transition:color .2s;}
+    .nav-links a:hover{color:var(--accent);}
+    .btn-nav{background:rgba(144,224,239,.15);color:var(--accent);padding:.5rem 1.2rem;border-radius:8px;border:1px solid rgba(144,224,239,.3);font-weight:600;text-decoration:none;transition:all .2s;}
+    .btn-nav:hover{background:rgba(144,224,239,.25);}
+
+    /* MAIN */
+    .page-wrap{width:min(900px,calc(100% - 2rem));margin:0 auto;padding:3rem 0 4rem;}
+    h1.page-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,2.8rem);margin-bottom:.5rem;text-align:center;}
+    p.page-sub{color:rgba(255,255,255,.65);text-align:center;margin-bottom:2.5rem;font-size:1rem;}
+
+    /* STEP INDICATOR */
+    .steps{display:flex;gap:0;align-items:center;justify-content:center;margin-bottom:2.5rem;}
+    .step{display:flex;flex-direction:column;align-items:center;gap:.4rem;position:relative;}
+    .step-num{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.9rem;border:2px solid rgba(255,255,255,.2);color:rgba(255,255,255,.4);background:transparent;transition:all .3s;}
+    .step-num.active{background:var(--accent);color:#041f32;border-color:var(--accent);}
+    .step-num.done{background:var(--success);color:#041f32;border-color:var(--success);}
+    .step-label{font-size:.75rem;color:rgba(255,255,255,.45);white-space:nowrap;}
+    .step-label.active{color:var(--accent);}
+    .step-line{width:60px;height:2px;background:rgba(255,255,255,.12);margin:0 .5rem;margin-bottom:1.2rem;flex-shrink:0;}
+
+    /* TYPE CARDS */
+    .type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:1.25rem;margin-bottom:2rem;}
+    .type-card{
+      background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);
+      border-radius:18px;padding:1.75rem 1.25rem;text-align:center;cursor:pointer;
+      transition:all .25s ease;user-select:none;
+    }
+    .type-card:hover{background:rgba(144,224,239,.1);border-color:rgba(144,224,239,.35);transform:translateY(-3px);}
+    .type-card.selected{background:rgba(144,224,239,.18);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
+    .type-card .icon{font-size:2.8rem;margin-bottom:.85rem;display:block;}
+    .type-card h3{font-size:1rem;margin-bottom:.4rem;color:#fff;}
+    .type-card p{font-size:.82rem;color:rgba(255,255,255,.55);line-height:1.5;}
+
+    /* FORM PANEL */
+    .form-panel{
+      background:rgba(18,24,18,.55);border:1px solid var(--border);
+      border-radius:22px;backdrop-filter:blur(20px);padding:2.5rem;
+      display:none;
+    }
+    .form-panel.visible{display:block;animation:fadeIn .35s ease;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+    .form-panel h2{font-size:1.4rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    .form-group{margin-bottom:1.25rem;}
+    .form-group label{display:block;font-size:.85rem;font-weight:600;margin-bottom:.5rem;color:rgba(255,255,255,.75);}
+    .form-group input,
+    .form-group select,
+    .form-group textarea{
+      width:100%;padding:.8rem 1rem;border-radius:10px;border:1px solid rgba(255,255,255,.15);
+      background:rgba(255,255,255,.06);color:var(--text);font-family:inherit;font-size:.95rem;
+      outline:none;transition:border-color .2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus{border-color:var(--accent);}
+    .form-group select option{background:#0c2a3a;color:#eef8ff;}
+    .form-group small{display:block;margin-top:.35rem;font-size:.78rem;color:rgba(255,255,255,.45);}
+
+    .btn-submit{
+      width:100%;padding:1rem;border-radius:12px;border:none;
+      background:linear-gradient(135deg,var(--accent-dark),var(--accent));
+      color:#041f32;font-family:inherit;font-size:1rem;font-weight:700;
+      cursor:pointer;transition:all .25s;margin-top:.5rem;
+    }
+    .btn-submit:hover{filter:brightness(1.1);transform:translateY(-2px);box-shadow:0 6px 20px rgba(144,224,239,.3);}
+    .btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+    /* ALERTS */
+    .alert{padding:1rem 1.25rem;border-radius:12px;margin-bottom:1rem;font-size:.9rem;display:none;}
+    .alert.error{background:rgba(255,107,107,.15);border:1px solid rgba(255,107,107,.3);color:#ff6b6b;}
+    .alert.success{background:rgba(149,225,211,.15);border:1px solid rgba(149,225,211,.3);color:var(--success);}
+    .alert.visible{display:block;}
+
+    .divider{text-align:center;margin:1.25rem 0;color:rgba(255,255,255,.35);font-size:.85rem;position:relative;}
+    .divider::before,.divider::after{content:"";position:absolute;top:50%;width:calc(50% - 2.5rem);height:1px;background:rgba(255,255,255,.1);}
+    .divider::before{left:0;} .divider::after{right:0;}
+    .login-link{text-align:center;margin-top:1rem;font-size:.9rem;color:rgba(255,255,255,.55);}
+    .login-link a{color:var(--accent);text-decoration:none;font-weight:600;}
+
+    @media(max-width:640px){.form-row{grid-template-columns:1fr;}.type-grid{grid-template-columns:1fr 1fr;}}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-container">
+    <a href="index.html" class="logo"><span>KT</span>KilimoTrack</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="login.html" class="btn-nav">Login</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <h1 class="page-title">Create Your Account</h1>
+  <p class="page-sub">Choose your account type to get started with KilimoTrack</p>
+
+  <!-- Step indicator -->
+  <div class="steps">
+    <div class="step">
+      <div class="step-num active" id="step1-num">1</div>
+      <div class="step-label active" id="step1-lbl">Choose Type</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-num" id="step2-num">2</div>
+      <div class="step-label" id="step2-lbl">Your Details</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-num" id="step3-num">3</div>
+      <div class="step-label" id="step3-lbl">Done ✓</div>
+    </div>
+  </div>
+
+  <!-- STEP 1: Account Type Picker -->
+  <div id="type-picker">
+    <div class="type-grid">
+      <div class="type-card" id="card-farmer" onclick="selectType('farmer')">
+        <span class="icon">🧑‍🌾</span>
+        <h3>Independent Farmer</h3>
+        <p>Track your own crops, soil, and pest records</p>
+      </div>
+      <div class="type-card" id="card-ngo" onclick="selectType('NGO')">
+        <span class="icon">🌍</span>
+        <h3>NGO</h3>
+        <p>Support smallholder farmers and post advisories</p>
+      </div>
+      <div class="type-card" id="card-mfg" onclick="selectType('Manufacturing Company')">
+        <span class="icon">🏭</span>
+        <h3>Manufacturing Company</h3>
+        <p>Supply agri-inputs and connect with farmers</p>
+      </div>
+      <div class="type-card" id="card-gov" onclick="selectType('Government Firm')">
+        <span class="icon">🏛️</span>
+        <h3>Government Firm</h3>
+        <p>Regulatory body or government extension office</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Farmer Registration Form -->
+  <div class="form-panel" id="form-farmer">
+    <h2>🧑‍🌾 Independent Farmer Registration</h2>
+    <div class="alert error" id="farmer-error"></div>
+    <div class="alert success" id="farmer-success"></div>
+    <form id="farmer-form" onsubmit="registerFarmer(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="f-name">Full Name *</label>
+          <input type="text" id="f-name" name="name" placeholder="e.g. Samuel Kipchoge" required/>
+        </div>
+        <div class="form-group">
+          <label for="f-phone">Phone Number *</label>
+          <input type="tel" id="f-phone" name="phone" placeholder="+254 7XX XXX XXX" required/>
+          <small>Used as your login identifier</small>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="f-email">Email (optional)</label>
+          <input type="email" id="f-email" name="email" placeholder="you@example.com"/>
+        </div>
+        <div class="form-group">
+          <label for="f-location">Location / County *</label>
+          <input type="text" id="f-location" name="location" placeholder="e.g. Rongo, Migori County" required/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="f-farm">Farm Name</label>
+          <input type="text" id="f-farm" name="farm_name" placeholder="e.g. Green Valley Farm"/>
+        </div>
+        <div class="form-group">
+          <label for="f-acreage">Farm Size (acres)</label>
+          <input type="number" id="f-acreage" name="acreage" placeholder="e.g. 2.5" step="0.1" min="0"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="f-password">Password *</label>
+          <input type="password" id="f-password" name="password" placeholder="Min. 6 characters" required minlength="6"/>
+        </div>
+        <div class="form-group">
+          <label for="f-confirm">Confirm Password *</label>
+          <input type="password" id="f-confirm" name="confirm" placeholder="Repeat password" required/>
+        </div>
+      </div>
+      <button type="submit" class="btn-submit" id="farmer-btn">🌱 Create Farmer Account</button>
+    </form>
+    <div class="login-link">Already have an account? <a href="login.html">Log in here</a></div>
+  </div>
+
+  <!-- STEP 2: Organization Registration Form -->
+  <div class="form-panel" id="form-org">
+    <h2 id="org-form-title">🌍 Organization Registration</h2>
+    <div class="alert error" id="org-error"></div>
+    <div class="alert success" id="org-success"></div>
+    <form id="org-form" onsubmit="registerOrg(event)">
+      <input type="hidden" id="org-type-hidden" name="org_type"/>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="o-name">Organization Name *</label>
+          <input type="text" id="o-name" name="org_name" placeholder="e.g. Kenya Agricultural Board" required/>
+        </div>
+        <div class="form-group">
+          <label for="o-contact">Contact Person</label>
+          <input type="text" id="o-contact" name="contact_name" placeholder="e.g. Jane Wanjiru"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="o-email">Contact Email *</label>
+          <input type="email" id="o-email" name="contact_email" placeholder="office@org.go.ke" required/>
+          <small>Used to log in</small>
+        </div>
+        <div class="form-group">
+          <label for="o-phone">Contact Phone</label>
+          <input type="tel" id="o-phone" name="contact_phone" placeholder="+254 7XX XXX XXX"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="o-location">Location / Region</label>
+        <input type="text" id="o-location" name="location" placeholder="e.g. Nairobi"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="o-password">Password *</label>
+          <input type="password" id="o-password" name="password" placeholder="Min. 6 characters" required minlength="6"/>
+        </div>
+        <div class="form-group">
+          <label for="o-confirm">Confirm Password *</label>
+          <input type="password" id="o-confirm" name="confirm" placeholder="Repeat password" required/>
+        </div>
+      </div>
+      <button type="submit" class="btn-submit" id="org-btn">🏛️ Create Organization Account</button>
+    </form>
+    <div class="login-link">Already have an account? <a href="login.html">Log in here</a></div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<script>
+  const API = 'http://localhost/kilimotrack/api';
+  let selectedType = null;
+
+  const orgIcons = {
+    'NGO': '🌍',
+    'Manufacturing Company': '🏭',
+    'Government Firm': '🏛️'
+  };
+
+  function selectType(type) {
+    selectedType = type;
+    // Reset card highlights
+    document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+    const cardMap = { farmer:'card-farmer', NGO:'card-ngo', 'Manufacturing Company':'card-mfg', 'Government Firm':'card-gov' };
+    document.getElementById(cardMap[type])?.classList.add('selected');
+
+    // Update step indicator
+    document.getElementById('step2-num').classList.add('active');
+    document.getElementById('step2-lbl').classList.add('active');
+
+    // Hide all panels
+    document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('visible'));
+
+    if (type === 'farmer') {
+      document.getElementById('form-farmer').classList.add('visible');
+    } else {
+      document.getElementById('org-type-hidden').value = type;
+      document.getElementById('org-form-title').textContent = `${orgIcons[type] || '🏛️'} ${type} Registration`;
+      document.getElementById('org-btn').textContent = `${orgIcons[type] || '🏛️'} Create ${type} Account`;
+      document.getElementById('form-org').classList.add('visible');
+    }
+
+    // Scroll to form
+    setTimeout(() => document.getElementById(type === 'farmer' ? 'form-farmer' : 'form-org').scrollIntoView({behavior:'smooth', block:'start'}), 100);
+  }
+
+  function showAlert(id, msg, type) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = `alert ${type} visible`;
+  }
+  function hideAlerts(prefix) {
+    ['error','success'].forEach(t => {
+      const el = document.getElementById(`${prefix}-${t}`);
+      if (el) el.className = 'alert ' + t;
+    });
+  }
+
+  async function registerFarmer(e) {
+    e.preventDefault();
+    hideAlerts('farmer');
+    const btn = document.getElementById('farmer-btn');
+    const form = document.getElementById('farmer-form');
+
+    const password = form.querySelector('#f-password').value;
+    const confirm  = form.querySelector('#f-confirm').value;
+    if (password !== confirm) {
+      showAlert('farmer-error', '❌ Passwords do not match', 'error'); return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Creating account…';
+
+    const data = {
+      name:      form.querySelector('#f-name').value.trim(),
+      phone:     form.querySelector('#f-phone').value.trim(),
+      email:     form.querySelector('#f-email').value.trim(),
+      location:  form.querySelector('#f-location').value.trim(),
+      farm_name: form.querySelector('#f-farm').value.trim(),
+      acreage:   form.querySelector('#f-acreage').value || null,
+      password
+    };
+
+    try {
+      const res  = await fetch(`${API}/farmers/register.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+      if (json.success) {
+        // Save session
+        localStorage.setItem('kt_token',   json.token);
+        localStorage.setItem('kt_user',    JSON.stringify(json.farmer));
+        localStorage.setItem('kt_account_type', 'farmer');
+        showAlert('farmer-success', '✅ Account created! Redirecting to dashboard…', 'success');
+        markDone();
+        setTimeout(() => window.location.href = 'dashboard.html', 1800);
+      } else {
+        showAlert('farmer-error', '❌ ' + json.message, 'error');
+        btn.disabled = false; btn.textContent = '🌱 Create Farmer Account';
+      }
+    } catch (err) {
+      showAlert('farmer-error', '❌ Could not reach server. Is XAMPP running?', 'error');
+      btn.disabled = false; btn.textContent = '🌱 Create Farmer Account';
+    }
+  }
+
+  async function registerOrg(e) {
+    e.preventDefault();
+    hideAlerts('org');
+    const btn  = document.getElementById('org-btn');
+    const form = document.getElementById('org-form');
+
+    const password = form.querySelector('#o-password').value;
+    const confirm  = form.querySelector('#o-confirm').value;
+    if (password !== confirm) {
+      showAlert('org-error', '❌ Passwords do not match', 'error'); return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Creating account…';
+
+    const data = {
+      org_name:      form.querySelector('#o-name').value.trim(),
+      org_type:      selectedType,
+      contact_name:  form.querySelector('#o-contact').value.trim(),
+      contact_email: form.querySelector('#o-email').value.trim(),
+      contact_phone: form.querySelector('#o-phone').value.trim(),
+      location:      form.querySelector('#o-location').value.trim(),
+      password
+    };
+
+    try {
+      const res  = await fetch(`${API}/organizations/register.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+      if (json.success) {
+        localStorage.setItem('kt_token',   json.token);
+        localStorage.setItem('kt_user',    JSON.stringify(json.organization));
+        localStorage.setItem('kt_account_type', 'organization');
+        showAlert('org-success', '✅ Account created! Redirecting to dashboard…', 'success');
+        markDone();
+        setTimeout(() => window.location.href = 'dashboard.html', 1800);
+      } else {
+        showAlert('org-error', '❌ ' + json.message, 'error');
+        btn.disabled = false; btn.textContent = `${orgIcons[selectedType] || '🏛️'} Create ${selectedType} Account`;
+      }
+    } catch (err) {
+      showAlert('org-error', '❌ Could not reach server. Is XAMPP running?', 'error');
+      btn.disabled = false; btn.textContent = `${orgIcons[selectedType] || '🏛️'} Create ${selectedType} Account`;
+    }
+  }
+
+  function markDone() {
+    document.getElementById('step3-num').classList.add('done');
+    document.getElementById('step3-lbl').style.color = 'var(--success)';
+  }
+</script>
+</body>
+</html>

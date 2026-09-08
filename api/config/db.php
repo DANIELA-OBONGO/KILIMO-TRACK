@@ -1,14 +1,14 @@
 <?php
-// KilimoTrack — Database Configuration
-// Connects to the local XAMPP MySQL instance
+// KilimoTrack — Database Configuration (Railway MySQL)
 
-define('DB_HOST', 'localhost');
+define('DB_HOST', 'mysql.railway.internal');
 define('DB_USER', 'root');
-define('DB_PASS', '');          // XAMPP default is blank password
-define('DB_NAME', 'kilimotrack');
+define('DB_PASS', 'fgNdDsOPKfXSIjOwRbpqqvkJODuCcEoR');
+define('DB_NAME', 'railway');
+define('DB_PORT', 3306);
 
 function getDB(): mysqli {
-    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
     if ($conn->connect_error) {
         http_response_code(500);
         echo json_encode([
